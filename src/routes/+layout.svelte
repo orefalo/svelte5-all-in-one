@@ -1,10 +1,16 @@
 <script lang="ts">
-	import { i18n } from '$lib/i18n';
-	import { ParaglideJS } from '@inlang/paraglide-sveltekit';
 	import '../app.css';
+	import { onMount } from 'svelte';
+	import { i18n } from '$lib/i18n';
+
 	let { children } = $props();
+	let mounted = $state(false);
+
+	onMount(() => {
+		mounted = true;
+	});
 </script>
 
-<ParaglideJS {i18n}>
+{#if mounted}
 	{@render children()}
-</ParaglideJS>
+{/if}
