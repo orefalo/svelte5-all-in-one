@@ -15,10 +15,13 @@
     "test": "bun run test:unit -- --run && bun run test:e2e",
     "test:e2e": "playwright test",
     "postbuild": "bunx svelte-kit sync",
-    "postbuild-old": "bunx svelte-kit sync && svelte-kit build",    "ios": "bun run build && bunx cap sync && bunx cap update ios && bunx cap copy ios && bunx cap run ios",
+    "postbuild-old": "bunx svelte-kit sync && svelte-kit build",
+    "ios": "bun run build && bunx cap sync && bunx cap update ios && bunx cap copy ios && bunx cap run ios",
     "ios-reload": "cap run ios -l --external --port=5173",
     "android": "bun run build && bunx cap sync && bunx cap update android && bunx cap copy android && bunx cap run android",
-    "android-reload": "cap run android -l --external --port=5173"
+    "android-reload": "cap run android -l --external --port=5173",
+	"tauri": "tauri",
+	"build-tauri": "bun run build && tauri build"
   },
   "devDependencies": {
     "@capacitor/cli": "^6.1.2",
@@ -26,6 +29,7 @@
     "@sveltejs/adapter-static": "^3.0.6",
     "@sveltejs/kit": "^2.5.27",
     "@sveltejs/vite-plugin-svelte": "^4.0.0",
+    "@tauri-apps/cli": "1.0.0",
     "@types/eslint": "^9.6.0",
     "autoprefixer": "^10.4.20",
     "bits-ui": "^0.21.16",
