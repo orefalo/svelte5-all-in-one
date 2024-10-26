@@ -20,6 +20,9 @@ const config = {
 		}),
 		prerender: {
 			entries: ['*']
+		},
+		alias: {
+			'@/*': './path/to/lib/*'
 		}
 	}
 };
