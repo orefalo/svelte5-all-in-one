@@ -22,10 +22,12 @@ sips -Z 144 static/icon-2048.png --out static/icon-144.png
 sips -Z 128 static/icon-2048.png --out static/icon-128.png
 sips -Z 120 static/icon-2048.png --out static/icon-120.png
 sips -Z 96 static/icon-2048.png --out static/icon-96.png
+sips -Z 72 static/icon-2048.png --out static/icon-72.png
 sips -Z 64 static/icon-2048.png --out static/icon-64.png
+sips -Z 48 static/icon-2048.png --out static/icon-48.png
 sips -Z 32 static/icon-2048.png --out static/icon-32.png
-sips -Z 32 static/icon-2048.png --out static/icon-24.png
-sips -Z 32 static/icon-2048.png --out static/icon-16.png
+sips -Z 24 static/icon-2048.png --out static/icon-24.png
+sips -Z 16 static/icon-2048.png --out static/icon-16.png
 # make apple-touch-icon
 sips -Z 180 static/icon-2048.png --out static/apple-touch-icon.png
 # make favicons (requires convert, part of ImageMagick)
