@@ -4,18 +4,24 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev",
-    "build": "vite build && npm run postbuild",
+    "build": "vite build",
+    "build-old": "vite build && bun run postbuild",
     "preview": "vite preview",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
     "format": "prettier --write .",
     "lint": "prettier --check . && eslint .",
     "test:unit": "vitest",
-    "test": "npm run test:unit -- --run && npm run test:e2e",
+    "test": "bun run test:unit -- --run && bun run test:e2e",
     "test:e2e": "playwright test",
-    "postbuild": "npx svelte-kit sync && svelte-kit build"
+    "postbuild": "bunx svelte-kit sync",
+    "postbuild-old": "bunx svelte-kit sync && svelte-kit build",    "ios": "bun run build && bunx cap sync && bunx cap update ios && bunx cap copy ios && bunx cap run ios",
+    "ios-reload": "cap run ios -l --external --port=5173",
+    "android": "bun run build && bunx cap sync && bunx cap update android && bunx cap copy android && bunx cap run android",
+    "android-reload": "cap run android -l --external --port=5173"
   },
   "devDependencies": {
+    "@capacitor/cli": "^6.1.2",
     "@playwright/test": "^1.45.3",
     "@sveltejs/adapter-static": "^3.0.6",
     "@sveltejs/kit": "^2.5.27",
@@ -33,6 +39,7 @@
     "prettier-plugin-tailwindcss": "^0.6.5",
     "svelte": "^5.0.0",
     "svelte-check": "^4.0.0",
+    "svelte-kit": "^1.2.0",
     "tailwind-merge": "^2.5.4",
     "tailwind-variants": "^0.2.1",
     "tailwindcss": "^3.4.9",
@@ -42,6 +49,9 @@
     "vitest": "^2.0.4"
   },
   "dependencies": {
+    "@capacitor/android": "^6.1.2",
+    "@capacitor/core": "^6.1.2",
+    "@capacitor/ios": "^6.1.2",
     "@inlang/paraglide-sveltekit": "^0.11.1"
   }
 }
