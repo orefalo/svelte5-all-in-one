@@ -11,6 +11,10 @@
 	});
 </script>
 
+<svelte:head>
+	<title>{__APP_TITLE__} {__APP_VERSION__}</title>
+</svelte:head>
+
 {#if mounted}
 	{@render children()}
 {/if}
