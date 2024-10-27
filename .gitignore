@@ -28,3 +28,6 @@ vite.config.ts.timestamp-*
 static/icon-*.png
 static/apple-touch-icon.png
 static/favicon*
+
+# Tauri
+/src-tauri
