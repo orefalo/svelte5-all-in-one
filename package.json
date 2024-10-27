@@ -1,5 +1,8 @@
 {
   "name": "sv1",
+  "title": "app title here",
+  "homepage": "https://example.com",
+  "description": "app description here",
   "version": "0.0.1",
   "type": "module",
   "scripts": {
