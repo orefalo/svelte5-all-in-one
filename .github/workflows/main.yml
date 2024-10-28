@@ -53,9 +53,22 @@ jobs:
           rm -f src-tauri/Cargo.lock
           rm -rf src-tauri/target
 
+      # Before cleaning src-tauri, backup the icons
+      - name: Backup icons
+        run: |
+          mkdir -p icons_backup
+          cp -r src-tauri/icons/* icons_backup/
+
       # Start fresh by removing the entire src-tauri directory
       - name: Clean src-tauri
         run: rm -rf src-tauri
+
+      # After creating the src-tauri directory structure, restore the icons
+      - name: Restore icons
+        run: |
+          mkdir -p src-tauri/icons
+          cp -r icons_backup/* src-tauri/icons/
+          ls -la src-tauri/icons/  # Verify the icons are restored
 
       # Create new directory structure
       - name: Create directory structure
