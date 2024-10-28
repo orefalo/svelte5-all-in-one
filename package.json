@@ -3,7 +3,7 @@
   "title": "app title here",
   "homepage": "https://example.com",
   "description": "app description here",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "type": "module",
   "scripts": {
     "dev": "vite dev --host 0.0.0.0",
