@@ -108,7 +108,9 @@ jobs:
         if: runner.os == 'Windows'
         shell: powershell
         run: |
-          New-Item -ItemType Directory -Force -Path src-tauri/icons
+          if (-not (Test-Path src-tauri/icons)) {
+              New-Item -ItemType Directory -Force -Path src-tauri/icons
+          }
           Copy-Item -Path "icons_backup/*" -Destination src-tauri/icons -Recurse -Force
           Get-ChildItem src-tauri/icons  # Verify the icons are restored
 
