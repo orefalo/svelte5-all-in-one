@@ -202,7 +202,7 @@ jobs:
             "build": {
               "beforeBuildCommand": "npm run build",
               "beforeDevCommand": "npm run dev",
-              "frontendDist": "../dist"  # Changed from "../build" to "../dist"
+              "frontendDist": "../build"  # Changed from "../build" to "../dist"
             },
             "app": {
               "windows": [
