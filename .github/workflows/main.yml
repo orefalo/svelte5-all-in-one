@@ -48,21 +48,35 @@ jobs:
       - name: Install Tauri CLI
         run: npm install -g @tauri-apps/cli
 
-      - name: Debug - List src-tauri contents
+      - name: Create or update Cargo.toml
         run: |
-          ls -R src-tauri
+          mkdir -p src-tauri
+          cat << EOF > src-tauri/Cargo.toml
+          [package]
+          name = "sv1"
+          version = "0.1.0"
+          description = "A Tauri App"
+          authors = ["you"]
+          license = ""
+          repository = ""
+          default-run = "sv1"
+          edition = "2021"
+          rust-version = "1.60"
 
-      - name: Debug - Display Cargo.toml contents
-        run: |
-          cat src-tauri/Cargo.toml
+          [build-dependencies]
+          tauri-build = { version = "1.5.0", features = [] }
 
-      - name: Update Cargo.toml
-        run: |
-          sed -i 's/tauri = { version = "1.8.1", features = \["native-tls"\] }/tauri = { version = "1.8.1", features = ["api-all"] }/' src-tauri/Cargo.toml
+          [dependencies]
+          serde_json = "1.0"
+          serde = { version = "1.0", features = ["derive"] }
+          tauri = { version = "1.8.1", features = ["api-all"] }
 
-      - name: Debug - Display updated Cargo.toml contents
-        run: |
-          cat src-tauri/Cargo.toml
+          [features]
+          custom-protocol = [ "tauri/custom-protocol" ]
+          EOF
+
+      - name: Display Cargo.toml contents
+        run: cat src-tauri/Cargo.toml
 
       - name: Verify Tauri config
         run: |
@@ -90,4 +104,3 @@ jobs:
           releaseDraft: true
           prerelease: false
           args: ${{ matrix.args }}
-          
