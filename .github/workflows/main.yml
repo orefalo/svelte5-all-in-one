@@ -98,7 +98,11 @@ jobs:
           ls -la src-tauri/icons/32x32.png
           file src-tauri/icons/32x32.png
 
-      # Create a minimal tauri.conf.json
+      # Add build step for web assets
+      - name: Build web
+        run: npm run build
+
+      # Create a minimal tauri.conf.json with correct frontendDist path
       - name: Create tauri.conf.json
         shell: bash
         run: |
@@ -109,8 +113,8 @@ jobs:
             "productName": "sv1",
             "version": "0.1.0",
             "build": {
-              "beforeBuildCommand": "",
-              "beforeDevCommand": "",
+              "beforeBuildCommand": "npm run build",
+              "beforeDevCommand": "npm run dev",
               "frontendDist": "../build"
             },
             "app": {
@@ -143,18 +147,21 @@ jobs:
           }
           EOF
 
-      - name: Create main.rs
-        shell: bash
+      # Create a simple index.html in the build directory
+      - name: Create build directory and files
         run: |
-          mkdir -p src-tauri/src
-          cat > src-tauri/src/main.rs << 'EOF'
-          #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
-
-          fn main() {
-            tauri::Builder::default()
-              .run(tauri::generate_context!())
-              .expect("error while running tauri application");
-          }
+          mkdir -p build
+          cat > build/index.html << 'EOF'
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <meta charset="UTF-8" />
+              <title>Tauri App</title>
+            </head>
+            <body>
+              <h1>Hello, Tauri!</h1>
+            </body>
+          </html>
           EOF
 
       - name: Verify files
