@@ -188,7 +188,7 @@ jobs:
         run: |
           npm ci --force
           npm run build
-          ls -la dist  # Verify the build output
+          ls -la build  # Verify the build output
 
       # Create tauri.conf.json with correct frontendDist
       - name: Create tauri.conf.json
