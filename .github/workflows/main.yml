@@ -130,20 +130,7 @@ jobs:
             "bundle": {
               "active": true,
               "icon": ["icons/32x32.png"],
-              "targets": {
-                "aarch64-apple-darwin": {
-                  "targets": ["dmg", "app", "updater"]
-                },
-                "x86_64-apple-darwin": {
-                  "targets": ["dmg", "app", "updater"]
-                },
-                "x86_64-linux-gnu": {
-                  "targets": ["deb", "appimage", "updater"]
-                },
-                "x86_64-pc-windows-msvc": {
-                  "targets": ["msi", "nsis", "updater"]
-                }
-              }
+              "targets": ["app", "dmg", "updater"]
             }
           }
           EOF
