@@ -74,5 +74,5 @@ jobs:
           releaseDraft: true
           prerelease: false
           args: ${{ matrix.args }}
-          projectPath: '.'
-          distPath: './build'  # Make sure this matches your project's build output directory
+          projectPath: './src-tauri'
+          distPath: '../build'
