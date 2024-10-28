@@ -35,7 +35,7 @@
     ],
     "longDescription": "",
     "macOS": {
-      "entitlements": "src-tauri/entitlements.plist",
+      "entitlements": "entitlements.plist",
       "exceptionDomain": "",
       "frameworks": [],
       "providerShortName": null,

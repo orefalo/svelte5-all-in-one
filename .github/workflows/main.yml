@@ -149,8 +149,8 @@ jobs:
             "productName": "sv1",
             "version": "0.1.0",
             "build": {
-              "beforeBuildCommand": "",
-              "beforeDevCommand": "",
+              "beforeBuildCommand": "npm run build",
+              "beforeDevCommand": "npm run dev",
               "frontendDist": "../build"
             },
             "app": {
@@ -169,11 +169,17 @@ jobs:
             },
             "bundle": {
               "active": true,
-              "icon": ["icons/32x32.png"],
+              "icon": [
+                "icons/32x32.png",
+                "icons/128x128.png",
+                "icons/128x128@2x.png",
+                "icons/icon.icns",
+                "icons/icon.ico"
+              ],
               "category": "DeveloperTool",
               "copyright": "",
               "macOS": {
-                "entitlements": null,
+                "entitlements": "entitlements.plist",
                 "exceptionDomain": "",
                 "frameworks": [],
                 "providerShortName": null,
@@ -230,13 +236,7 @@ jobs:
               "category": "DeveloperTool",
               "copyright": "",
               "macOS": {
-                "entitlements": {
-                  "com.apple.security.cs.allow-jit": true,
-                  "com.apple.security.cs.allow-unsigned-executable-memory": true,
-                  "com.apple.security.cs.disable-library-validation": true,
-                  "com.apple.security.cs.allow-dyld-environment-variables": true,
-                  "com.apple.security.get-task-allow": true
-                },
+                "entitlements": "entitlements.plist",
                 "exceptionDomain": "",
                 "frameworks": [],
                 "providerShortName": null,
