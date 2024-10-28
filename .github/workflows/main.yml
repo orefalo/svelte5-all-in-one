@@ -122,15 +122,7 @@ jobs:
       - name: Build Tauri App
         run: npm run tauri build -- ${{ matrix.args }}
 
-      - name: Create icons directory and files
-        run: |
-          mkdir -p src-tauri/icons
-          # Create a simple 32x32 PNG icon (black square)
-          convert -size 32x32 xc:black src-tauri/icons/32x32.png
-          convert -size 128x128 xc:black src-tauri/icons/128x128.png
-          convert -size 128x128 xc:black src-tauri/icons/icon.png
-
-      - name: Install ImageMagick (for icon creation)
+      - name: Install ImageMagick (for ubuntu)
         if: matrix.platform == 'ubuntu-22.04'
         run: sudo apt-get install -y imagemagick
 
@@ -141,6 +133,16 @@ jobs:
       - name: Install ImageMagick (for Windows)
         if: matrix.platform == 'windows-latest'
         run: choco install imagemagick.app
+
+      - name: Create icons directory and files
+        run: |
+          mkdir -p src-tauri/icons
+          convert -size 32x32 xc:black src-tauri/icons/32x32.png
+          convert -size 128x128 xc:black src-tauri/icons/128x128.png
+          convert -size 128x128 xc:black src-tauri/icons/icon.png
+          convert src-tauri/icons/icon.png src-tauri/icons/icon.ico
+          convert src-tauri/icons/icon.png src-tauri/icons/icon.icns
+          ls -la src-tauri/icons/
 
       - name: Create tauri.conf.json
         run: |
@@ -168,9 +170,7 @@ jobs:
                 "icon": [
                   "icons/32x32.png",
                   "icons/128x128.png",
-                  "icons/128x128@2x.png",
-                  "icons/icon.icns",
-                  "icons/icon.ico"
+                  "icons/icon.png"
                 ],
                 "identifier": "com.tauri.dev",
                 "longDescription": "",
