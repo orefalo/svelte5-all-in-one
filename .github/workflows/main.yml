@@ -53,10 +53,18 @@ jobs:
           rm -f src-tauri/Cargo.lock
           rm -rf src-tauri/target
 
-      - name: Create or update Cargo.toml
+      # Start fresh by removing the entire src-tauri directory
+      - name: Clean src-tauri
+        run: rm -rf src-tauri
+
+      # Create new directory structure
+      - name: Create directory structure
+        run: mkdir -p src-tauri/src src-tauri/icons
+
+      # Create Cargo.toml
+      - name: Create Cargo.toml
         run: |
-          mkdir -p src-tauri
-          cat << EOF > src-tauri/Cargo.toml
+          cat > src-tauri/Cargo.toml << 'EOF'
           [package]
           name = "sv1"
           version = "0.1.0"
@@ -81,40 +89,45 @@ jobs:
           custom-protocol = [ "tauri/custom-protocol" ]
           EOF
 
+      # Create build.rs
       - name: Create build.rs
         run: |
-          cat << EOF > src-tauri/build.rs
+          cat > src-tauri/build.rs << 'EOF'
           fn main() {
             tauri_build::build()
           }
           EOF
 
-      # Create the icon first, before any Tauri setup
-      - name: Create icon directory and file
-        shell: bash
+      # Create main.rs
+      - name: Create main.rs
         run: |
-          mkdir -p src-tauri/icons
+          cat > src-tauri/src/main.rs << 'EOF'
+          #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+
+          fn main() {
+            tauri::Builder::default()
+              .run(tauri::generate_context!())
+              .expect("error while running tauri application");
+          }
+          EOF
+
+      # Create icon
+      - name: Create icon
+        run: |
           echo 'iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAB5SURBVFhH7ZBBCsAwCAT9/6fTQ8GTYLKr0BZ6GAIZNaOH9q4557xaa4mI9N77OI7DzFJKKdd1pZRyPxw5Zy2llNZaEhFprWXvfR9+BzAz3vtfQFVRAf8IqCoq4B8BVUUFqCoqQFVRAaqKClBVVICqogJUFRVQVXwD8AYrnifzVVwR3gAAAABJRU5ErkJggg==' | base64 -d > src-tauri/icons/32x32.png
-          ls -la src-tauri/icons/32x32.png
-          file src-tauri/icons/32x32.png
 
-      # Add build step for web assets
-      - name: Build web
-        run: npm run build
-
-      # Create a minimal tauri.conf.json with correct frontendDist path
+      # Create tauri.conf.json
       - name: Create tauri.conf.json
-        shell: bash
         run: |
           cat > src-tauri/tauri.conf.json << 'EOF'
           {
             "$schema": "https://raw.githubusercontent.com/tauri-apps/tauri/dev/tooling/cli/schema.json",
-            "identifier": "com.example.sv1",
+            "identifier": "com.tauri.dev",
             "productName": "sv1",
             "version": "0.1.0",
             "build": {
-              "beforeBuildCommand": "npm run build",
-              "beforeDevCommand": "npm run dev",
+              "beforeBuildCommand": "",
+              "beforeDevCommand": "",
               "frontendDist": "../build"
             },
             "app": {
@@ -147,8 +160,8 @@ jobs:
           }
           EOF
 
-      # Create a simple index.html in the build directory
-      - name: Create build directory and files
+      # Create build directory with index.html
+      - name: Create build directory
         run: |
           mkdir -p build
           cat > build/index.html << 'EOF'
@@ -164,19 +177,13 @@ jobs:
           </html>
           EOF
 
-      - name: Verify files
-        shell: bash
+      # Verify the structure
+      - name: Verify structure
         run: |
-          echo "Icon exists:"
-          ls -la src-tauri/icons/32x32.png
-          echo "Icon file type:"
-          file src-tauri/icons/32x32.png
-          echo "Tauri config exists:"
-          ls -la src-tauri/tauri.conf.json
-          echo "Main.rs exists:"
-          ls -la src-tauri/src/main.rs
           echo "Directory structure:"
           tree src-tauri || ls -R src-tauri
+          echo "Main.rs content:"
+          cat src-tauri/src/main.rs
 
       # ... continue with build steps ...
 
