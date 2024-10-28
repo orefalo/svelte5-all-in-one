@@ -130,7 +130,15 @@ jobs:
             "bundle": {
               "active": true,
               "icon": ["icons/32x32.png"],
-              "targets": ["app", "dmg", "updater"]
+              "category": "DeveloperTool",
+              "copyright": "",
+              "macOS": {
+                "entitlements": null,
+                "exceptionDomain": "",
+                "frameworks": [],
+                "providerShortName": null,
+                "signingIdentity": null
+              }
             }
           }
           EOF
