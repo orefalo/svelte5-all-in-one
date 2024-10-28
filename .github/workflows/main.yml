@@ -76,18 +76,45 @@ jobs:
           rm -f src-tauri/Cargo.lock
           rm -rf src-tauri/target
 
-      # Before cleaning src-tauri, backup the icons
+      # Backup icons
       - name: Backup icons
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          New-Item -ItemType Directory -Force -Path icons_backup
+          Copy-Item -Path "src-tauri/icons/*" -Destination icons_backup -Recurse -Force
+
+      - name: Backup icons
+        if: runner.os != 'Windows'
+        shell: bash
         run: |
           mkdir -p icons_backup
           cp -r src-tauri/icons/* icons_backup/
 
-      # Start fresh by removing the entire src-tauri directory
+      # Clean src-tauri directory
       - name: Clean src-tauri
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          if (Test-Path src-tauri) { Remove-Item -Recurse -Force src-tauri }
+
+      - name: Clean src-tauri
+        if: runner.os != 'Windows'
+        shell: bash
         run: rm -rf src-tauri
 
-      # After creating the src-tauri directory structure, restore the icons
+      # Restore icons
       - name: Restore icons
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          New-Item -ItemType Directory -Force -Path src-tauri/icons
+          Copy-Item -Path "icons_backup/*" -Destination src-tauri/icons -Recurse -Force
+          Get-ChildItem src-tauri/icons  # Verify the icons are restored
+
+      - name: Restore icons
+        if: runner.os != 'Windows'
+        shell: bash
         run: |
           mkdir -p src-tauri/icons
           cp -r icons_backup/* src-tauri/icons/
