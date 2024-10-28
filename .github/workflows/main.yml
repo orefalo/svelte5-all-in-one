@@ -89,14 +89,12 @@ jobs:
           }
           EOF
 
+      # First, let's create a minimal main.rs without the Manager import
       - name: Create main.rs
         run: |
           mkdir -p src-tauri/src
           cat << EOF > src-tauri/src/main.rs
-          // Prevents additional console window on Windows in release
           #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
-
-          use tauri::Manager;
 
           fn main() {
             tauri::Builder::default()
@@ -134,16 +132,7 @@ jobs:
         if: matrix.platform == 'windows-latest'
         run: choco install imagemagick.app
 
-      - name: Create icons directory and files
-        run: |
-          mkdir -p src-tauri/icons
-          convert -size 32x32 xc:black src-tauri/icons/32x32.png
-          convert -size 128x128 xc:black src-tauri/icons/128x128.png
-          convert -size 128x128 xc:black src-tauri/icons/icon.png
-          convert src-tauri/icons/icon.png src-tauri/icons/icon.ico
-          convert src-tauri/icons/icon.png src-tauri/icons/icon.icns
-          ls -la src-tauri/icons/
-
+      # Create a simpler tauri.conf.json with minimal icon requirements
       - name: Create tauri.conf.json
         run: |
           cat << EOF > src-tauri/tauri.conf.json
@@ -161,40 +150,10 @@ jobs:
             "tauri": {
               "bundle": {
                 "active": true,
-                "category": "DeveloperTool",
-                "copyright": "",
-                "deb": {
-                  "depends": []
-                },
-                "externalBin": [],
                 "icon": [
-                  "icons/32x32.png",
-                  "icons/128x128.png",
-                  "icons/icon.png"
+                  "icons/32x32.png"
                 ],
-                "identifier": "com.tauri.dev",
-                "longDescription": "",
-                "macOS": {
-                  "entitlements": null,
-                  "exceptionDomain": "",
-                  "frameworks": [],
-                  "providerShortName": null,
-                  "signingIdentity": null
-                },
-                "resources": [],
-                "shortDescription": "",
-                "targets": "all",
-                "windows": {
-                  "certificateThumbprint": null,
-                  "digestAlgorithm": "sha256",
-                  "timestampUrl": ""
-                }
-              },
-              "security": {
-                "csp": null
-              },
-              "updater": {
-                "active": false
+                "identifier": "com.tauri.dev"
               },
               "windows": [
                 {
@@ -208,6 +167,27 @@ jobs:
             }
           }
           EOF
+
+      # Create a simple icon using a more basic approach
+      - name: Create icon
+        run: |
+          mkdir -p src-tauri/icons
+          if [ "${{ matrix.platform }}" = "windows-latest" ]; then
+            echo "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAA7AAAAOwBeShxvQAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAABSdEVYdENvcHlyaWdodABDQzAgUHVibGljIERvbWFpbiBEZWRpY2F0aW9uIGh0dHA6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL3B1YmxpY2RvbWFpbi96ZXJvLzEuMC/G4735AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH5AYNDgE3tvKz6QAAABl0RVh0Q29tbWVudABDcmVhdGVkIHdpdGggR0lNUFeBDhcAAAAUSURBVFiF7cEBAQAAAIIg/6/uSEABAADuBgUAAAEVp4M/AAAAAElFTkSuQmCC" | base64 -d > src-tauri/icons/32x32.png
+          else
+            echo "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAA7AAAAOwBeShxvQAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAABSdEVYdENvcHlyaWdodABDQzAgUHVibGljIERvbWFpbiBEZWRpY2F0aW9uIGh0dHA6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL3B1YmxpY2RvbWFpbi96ZXJvLzEuMC/G4735AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH5AYNDgE3tvKz6QAAABl0RVh0Q29tbWVudABDcmVhdGVkIHdpdGggR0lNUFeBDhcAAAAUSURBVFiF7cEBAQAAAIIg/6/uSEABAADuBgUAAAEVp4M/AAAAAElFTkSuQmCC" | base64 -d > src-tauri/icons/32x32.png
+          fi
+          ls -la src-tauri/icons/
+
+      # Verify the icon exists and has content
+      - name: Verify icon
+        run: |
+          echo "Icon directory contents:"
+          ls -la src-tauri/icons/
+          echo "Icon file size:"
+          stat src-tauri/icons/32x32.png || ls -l src-tauri/icons/32x32.png
+
+      # Continue with the build...
 
       - uses: tauri-apps/tauri-action@v0.4.3
         env:
