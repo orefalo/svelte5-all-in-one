@@ -89,53 +89,20 @@ jobs:
           }
           EOF
 
-      # First, let's create a minimal main.rs without the Manager import
-      - name: Create main.rs
+      # Create the icon first, before any Tauri setup
+      - name: Create icon directory and file
+        shell: bash
         run: |
-          mkdir -p src-tauri/src
-          cat << EOF > src-tauri/src/main.rs
-          #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+          mkdir -p src-tauri/icons
+          echo 'iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAB5SURBVFhH7ZBBCsAwCAT9/6fTQ8GTYLKr0BZ6GAIZNaOH9q4557xaa4mI9N77OI7DzFJKKdd1pZRyPxw5Zy2llNZaEhFprWXvfR9+BzAz3vtfQFVRAf8IqCoq4B8BVUUFqCoqQFVRAaqKClBVVICqogJUFRVQVXwD8AYrnifzVVwR3gAAAABJRU5ErkJggg==' | base64 -d > src-tauri/icons/32x32.png
+          ls -la src-tauri/icons/32x32.png
+          file src-tauri/icons/32x32.png
 
-          fn main() {
-            tauri::Builder::default()
-              .run(tauri::generate_context!())
-              .expect("error while running tauri application");
-          }
-          EOF
-
-      - name: Display Cargo.toml contents
-        run: cat src-tauri/Cargo.toml
-
-      - name: Verify Tauri config
-        run: |
-          if [ ! -f "src-tauri/tauri.conf.json" ]; then
-            echo "Error: src-tauri/tauri.conf.json not found"
-            exit 1
-          fi
-          cat src-tauri/tauri.conf.json
-
-      - name: Build the project
-        run: npm run build
-
-      - name: Build Tauri App
-        run: npm run tauri build -- ${{ matrix.args }}
-
-      - name: Install ImageMagick (for ubuntu)
-        if: matrix.platform == 'ubuntu-22.04'
-        run: sudo apt-get install -y imagemagick
-
-      - name: Install ImageMagick (for macOS)
-        if: matrix.platform == 'macos-latest'
-        run: brew install imagemagick
-
-      - name: Install ImageMagick (for Windows)
-        if: matrix.platform == 'windows-latest'
-        run: choco install imagemagick.app
-
-      # Create a simpler tauri.conf.json with minimal icon requirements
+      # Create a minimal tauri.conf.json
       - name: Create tauri.conf.json
+        shell: bash
         run: |
-          cat << EOF > src-tauri/tauri.conf.json
+          cat > src-tauri/tauri.conf.json << 'EOF'
           {
             "build": {
               "beforeBuildCommand": "",
@@ -150,9 +117,7 @@ jobs:
             "tauri": {
               "bundle": {
                 "active": true,
-                "icon": [
-                  "icons/32x32.png"
-                ],
+                "icon": ["icons/32x32.png"],
                 "identifier": "com.tauri.dev"
               },
               "windows": [
@@ -168,26 +133,35 @@ jobs:
           }
           EOF
 
-      # Create a simple icon using a more basic approach
-      - name: Create icon
+      - name: Create main.rs
+        shell: bash
         run: |
-          mkdir -p src-tauri/icons
-          if [ "${{ matrix.platform }}" = "windows-latest" ]; then
-            echo "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAA7AAAAOwBeShxvQAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAABSdEVYdENvcHlyaWdodABDQzAgUHVibGljIERvbWFpbiBEZWRpY2F0aW9uIGh0dHA6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL3B1YmxpY2RvbWFpbi96ZXJvLzEuMC/G4735AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH5AYNDgE3tvKz6QAAABl0RVh0Q29tbWVudABDcmVhdGVkIHdpdGggR0lNUFeBDhcAAAAUSURBVFiF7cEBAQAAAIIg/6/uSEABAADuBgUAAAEVp4M/AAAAAElFTkSuQmCC" | base64 -d > src-tauri/icons/32x32.png
-          else
-            echo "iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAA7AAAAOwBeShxvQAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAABSdEVYdENvcHlyaWdodABDQzAgUHVibGljIERvbWFpbiBEZWRpY2F0aW9uIGh0dHA6Ly9jcmVhdGl2ZWNvbW1vbnMub3JnL3B1YmxpY2RvbWFpbi96ZXJvLzEuMC/G4735AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH5AYNDgE3tvKz6QAAABl0RVh0Q29tbWVudABDcmVhdGVkIHdpdGggR0lNUFeBDhcAAAAUSURBVFiF7cEBAQAAAIIg/6/uSEABAADuBgUAAAEVp4M/AAAAAElFTkSuQmCC" | base64 -d > src-tauri/icons/32x32.png
-          fi
-          ls -la src-tauri/icons/
+          mkdir -p src-tauri/src
+          cat > src-tauri/src/main.rs << 'EOF'
+          #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-      # Verify the icon exists and has content
-      - name: Verify icon
+          fn main() {
+            tauri::Builder::default()
+              .run(tauri::generate_context!())
+              .expect("error while running tauri application");
+          }
+          EOF
+
+      - name: Verify files
+        shell: bash
         run: |
-          echo "Icon directory contents:"
-          ls -la src-tauri/icons/
-          echo "Icon file size:"
-          stat src-tauri/icons/32x32.png || ls -l src-tauri/icons/32x32.png
+          echo "Icon exists:"
+          ls -la src-tauri/icons/32x32.png
+          echo "Icon file type:"
+          file src-tauri/icons/32x32.png
+          echo "Tauri config exists:"
+          ls -la src-tauri/tauri.conf.json
+          echo "Main.rs exists:"
+          ls -la src-tauri/src/main.rs
+          echo "Directory structure:"
+          tree src-tauri || ls -R src-tauri
 
-      # Continue with the build...
+      # ... continue with build steps ...
 
       - uses: tauri-apps/tauri-action@v0.4.3
         env:
