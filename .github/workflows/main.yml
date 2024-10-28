@@ -60,9 +60,6 @@ jobs:
         if: matrix.platform != 'windows-latest'
         run: npm ci --force
 
-      - name: Install Tauri CLI
-        run: npm install -g @tauri-apps/cli
-
       - name: Clean Cargo cache (Windows)
         if: runner.os == 'Windows'
         shell: powershell
@@ -356,63 +353,22 @@ jobs:
           '@
           Set-Content -Path "src-tauri/tauri.conf.json" -Value $content
 
-      - name: Create tauri.conf.json
-        if: runner.os != 'Windows'
-        shell: bash
-        run: |
-          cat > src-tauri/tauri.conf.json << 'EOF'
-          {
-            "$schema": "https://raw.githubusercontent.com/tauri-apps/tauri/dev/tooling/cli/schema.json",
-            "identifier": "com.example.sv1",
-            "productName": "sv1",
-            "version": "0.3.0",
-            "build": {
-              "beforeBuildCommand": "npm run build",
-              "beforeDevCommand": "npm run dev",
-              "frontendDist": "../build"
-            },
-            "app": {
-              "windows": [
-                {
-                  "fullscreen": false,
-                  "height": 600,
-                  "resizable": true,
-                  "title": "sv1",
-                  "width": 800
-                }
-              ],
-              "security": {
-                "csp": null
-              }
-            },
-            "bundle": {
-              "active": true,
-              "icon": [
-                "icons/32x32.png",
-                "icons/128x128.png",
-                "icons/128x128@2x.png",
-                "icons/icon.icns",
-                "icons/icon.ico"
-              ],
-              "category": "DeveloperTool",
-              "copyright": "",
-              "macOS": {
-                "entitlements": "entitlements.plist",
-                "exceptionDomain": "",
-                "frameworks": [],
-                "providerShortName": null,
-                "signingIdentity": null
-              }
-            }
-          }
-          EOF
-
       # Install frontend dependencies and build the app
-      - name: Install and build frontend
+      - name: Install and build frontend (Windows)
+        if: runner.os == 'Windows'
+        shell: powershell
         run: |
           npm ci --force
           npm run build
-          ls -la build  # Verify the build output
+          Get-ChildItem -Path build -Force | Select-Object Name, Length, LastWriteTime
+
+      - name: Install and build frontend (non-Windows)
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          npm ci --force
+          npm run build
+          ls -la build
 
       # Create tauri.conf.json with correct frontendDist
       - name: Create tauri.conf.json
@@ -481,14 +437,41 @@ jobs:
           args: ${{ matrix.args }}
 
       # Clean up any existing files
-      - name: Clean Rust files
+      - name: Clean Rust files (Windows)
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          if (Test-Path src-tauri/src) { Remove-Item -Recurse -Force src-tauri/src }
+          if (Test-Path src-tauri/Cargo.lock) { Remove-Item -Force src-tauri/Cargo.lock }
+          if (Test-Path src-tauri/target) { Remove-Item -Recurse -Force src-tauri/target }
+
+      - name: Clean Rust files (non-Windows)
+        if: runner.os != 'Windows'
+        shell: bash
         run: |
           rm -rf src-tauri/src
           rm -f src-tauri/Cargo.lock
           rm -rf src-tauri/target
 
       # Create main.rs with absolutely minimal configuration
-      - name: Create main.rs
+      - name: Create main.rs (Windows)
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          New-Item -ItemType Directory -Force -Path src-tauri/src
+          $content = @'
+          #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+
+          fn main() {
+            tauri::Builder::default()
+              .run(tauri::generate_context!())
+              .expect("error while running tauri application");
+          }
+          '@
+          Set-Content -Path "src-tauri/src/main.rs" -Value $content
+
+      - name: Create main.rs (non-Windows)
+        if: runner.os != 'Windows'
         shell: bash
         run: |
           mkdir -p src-tauri/src
@@ -502,12 +485,46 @@ jobs:
           }
           EOF
 
-      # Verify the content of main.rs
-      - name: Verify main.rs content
+      # Verify the content of main.rs (Windows)
+      - name: Verify main.rs content (Windows)
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: Get-Content src-tauri/src/main.rs
+
+      # Verify the content of main.rs (non-Windows)
+      - name: Verify main.rs content (non-Windows)
+        if: runner.os != 'Windows'
+        shell: bash
         run: cat src-tauri/src/main.rs
 
       # Add this step after creating the tauri.conf.json
-      - name: Create entitlements.plist
+      - name: Create entitlements.plist (Windows)
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          $content = @'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>com.apple.security.cs.allow-jit</key>
+              <true/>
+              <key>com.apple.security.cs.allow-unsigned-executable-memory</key>
+              <true/>
+              <key>com.apple.security.cs.disable-library-validation</key>
+              <true/>
+              <key>com.apple.security.cs.allow-dyld-environment-variables</key>
+              <true/>
+              <key>com.apple.security.get-task-allow</key>
+              <true/>
+          </dict>
+          </plist>
+          '@
+          Set-Content -Path "src-tauri/entitlements.plist" -Value $content
+
+      - name: Create entitlements.plist (non-Windows)
+        if: runner.os != 'Windows'
+        shell: bash
         run: |
           cat > src-tauri/entitlements.plist << 'EOF'
           <?xml version="1.0" encoding="UTF-8"?>
@@ -545,4 +562,17 @@ jobs:
         shell: bash
         run: |
           mkdir -p src-tauri/icons
+
+      # Verify build output
+      - name: Verify build output
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          Get-ChildItem -Path build -Force | Select-Object Name, Length, LastWriteTime
+
+      - name: Verify build output
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          ls -la build  # Verify the build output
 
