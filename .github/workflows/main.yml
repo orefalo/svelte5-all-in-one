@@ -111,9 +111,9 @@ jobs:
           }
           EOF
 
-      # Install Pillow first
+      # Install Pillow with the necessary flag
       - name: Install Pillow
-        run: pip3 install Pillow
+        run: python3 -m pip install --break-system-packages Pillow
 
       # Then create the icon
       - name: Create icon
