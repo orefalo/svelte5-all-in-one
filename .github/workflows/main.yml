@@ -193,6 +193,14 @@ jobs:
           prerelease: false
           args: ${{ matrix.args }}
 
+      # Clean up any existing files
+      - name: Clean Rust files
+        run: |
+          rm -rf src-tauri/src
+          rm -f src-tauri/Cargo.lock
+          rm -rf src-tauri/target
+
+      # Create main.rs with absolutely minimal configuration
       - name: Create main.rs
         shell: bash
         run: |
@@ -201,10 +209,12 @@ jobs:
           #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
           fn main() {
-            let context = tauri::generate_context!();
             tauri::Builder::default()
-              .setup(|_app| Ok(()))
-              .run(context)
+              .run(tauri::generate_context!())
               .expect("error while running tauri application");
           }
           EOF
+
+      # Verify the content of main.rs
+      - name: Verify main.rs content
+        run: cat src-tauri/src/main.rs
