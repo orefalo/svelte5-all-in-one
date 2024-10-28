@@ -4,10 +4,6 @@
     "beforeBuildCommand": "",
     "beforeDevCommand": ""
   },
-  "package": {
-    "productName": "sv1",
-    "version": "0.1.0"
-  },
   "tauri": {
     "allowlist": {
       "all": true
@@ -59,6 +55,8 @@
         "title": "sv1",
         "width": 800
       }
-    ]
+    ],
+    "productName": "sv1",
+    "version": "0.1.0"
   }
 }
