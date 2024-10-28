@@ -257,16 +257,19 @@ jobs:
         if: runner.os == 'Windows'
         shell: powershell
         run: |
-          python3 -c "
+          python3 -c "@'
           from PIL import Image
           import os
+          
+          # Ensure directory exists
+          os.makedirs('src-tauri/icons', exist_ok=True)
           
           # Create a new 32x32 black image with alpha channel
           img = Image.new('RGBA', (32, 32), (0, 0, 0, 255))
           
           # Save as PNG with alpha channel
           img.save('src-tauri/icons/32x32.png', 'PNG')
-          "
+          '@"
 
       - name: Create icon
         if: runner.os != 'Windows'
@@ -301,7 +304,7 @@ jobs:
           file src-tauri/icons/32x32.png
 
       # Create tauri.conf.json
-      - name: Create tauri.conf.json
+      - name: Create tauri.conf.json (Windows)
         if: runner.os == 'Windows'
         shell: powershell
         run: |
@@ -352,6 +355,57 @@ jobs:
           }
           '@
           Set-Content -Path "src-tauri/tauri.conf.json" -Value $content
+
+      - name: Create tauri.conf.json (non-Windows)
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          cat > src-tauri/tauri.conf.json << 'EOF'
+          {
+            "$schema": "https://raw.githubusercontent.com/tauri-apps/tauri/dev/tooling/cli/schema.json",
+            "identifier": "com.example.sv1",
+            "productName": "sv1",
+            "version": "0.3.0",
+            "build": {
+              "beforeBuildCommand": "npm run build",
+              "beforeDevCommand": "npm run dev",
+              "frontendDist": "../build"
+            },
+            "app": {
+              "windows": [
+                {
+                  "fullscreen": false,
+                  "height": 600,
+                  "resizable": true,
+                  "title": "sv1",
+                  "width": 800
+                }
+              ],
+              "security": {
+                "csp": null
+              }
+            },
+            "bundle": {
+              "active": true,
+              "icon": [
+                "icons/32x32.png",
+                "icons/128x128.png",
+                "icons/128x128@2x.png",
+                "icons/icon.icns",
+                "icons/icon.ico"
+              ],
+              "category": "DeveloperTool",
+              "copyright": "",
+              "macOS": {
+                "entitlements": "entitlements.plist",
+                "exceptionDomain": "",
+                "frameworks": [],
+                "providerShortName": null,
+                "signingIdentity": null
+              }
+            }
+          }
+          EOF
 
       # Install frontend dependencies and build the app
       - name: Install and build frontend (Windows)
@@ -568,7 +622,12 @@ jobs:
         if: runner.os == 'Windows'
         shell: powershell
         run: |
-          Get-ChildItem -Path build -Force | Select-Object Name, Length, LastWriteTime
+          if (Test-Path build) {
+            Get-ChildItem -Path build -Force | Select-Object Name, Length, LastWriteTime
+          } else {
+            Write-Error "Build directory not found!"
+            exit 1
+          }
 
       - name: Verify build output
         if: runner.os != 'Windows'
