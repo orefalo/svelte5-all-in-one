@@ -135,6 +135,38 @@ jobs:
 
       # Create Cargo.toml
       - name: Create Cargo.toml
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          $content = @'
+          [package]
+          name = "sv1"
+          version = "0.3.0"
+          description = "A Tauri App"
+          authors = ["you"]
+          license = ""
+          repository = ""
+          default-run = "sv1"
+          edition = "2021"
+          rust-version = "1.60"
+          build = "build.rs"
+
+          [build-dependencies]
+          tauri-build = { version = "2.0.0-rc.13", features = [] }
+
+          [dependencies]
+          serde_json = "1.0"
+          serde = { version = "1.0", features = ["derive"] }
+          tauri = { version = "2.0.0-rc.13" }
+
+          [features]
+          custom-protocol = [ "tauri/custom-protocol" ]
+          '@
+          Set-Content -Path "src-tauri/Cargo.toml" -Value $content
+
+      - name: Create Cargo.toml
+        if: runner.os != 'Windows'
+        shell: bash
         run: |
           cat > src-tauri/Cargo.toml << 'EOF'
           [package]
@@ -163,6 +195,18 @@ jobs:
 
       # Create build.rs
       - name: Create build.rs
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          $content = @'
+          fn main() {
+            tauri_build::build()
+          }
+          '@
+          Set-Content -Path "src-tauri/build.rs" -Value $content
+
+      - name: Create build.rs
+        if: runner.os != 'Windows'
         run: |
           cat > src-tauri/build.rs << 'EOF'
           fn main() {
@@ -172,6 +216,23 @@ jobs:
 
       # Create main.rs
       - name: Create main.rs
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          $content = @'
+          #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+
+          fn main() {
+            tauri::Builder::default()
+              .run(tauri::generate_context!())
+              .expect("error while running tauri application");
+          }
+          '@
+          New-Item -ItemType Directory -Force -Path src-tauri/src
+          Set-Content -Path "src-tauri/src/main.rs" -Value $content
+
+      - name: Create main.rs
+        if: runner.os != 'Windows'
         run: |
           cat > src-tauri/src/main.rs << 'EOF'
           #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
@@ -381,3 +442,4 @@ jobs:
           </dict>
           </plist>
           EOF
+
