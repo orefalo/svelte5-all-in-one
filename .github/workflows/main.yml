@@ -257,7 +257,7 @@ jobs:
         if: runner.os == 'Windows'
         shell: powershell
         run: |
-          python3 -c "@'
+          $pythonScript = @"
           from PIL import Image
           import os
           
@@ -269,7 +269,10 @@ jobs:
           
           # Save as PNG with alpha channel
           img.save('src-tauri/icons/32x32.png', 'PNG')
-          '@"
+          "@
+          
+          $pythonScript | Out-File -Encoding UTF8 "create_icon.py"
+          python3 "create_icon.py"
 
       - name: Create icon
         if: runner.os != 'Windows'
