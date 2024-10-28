@@ -1,5 +1,6 @@
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vitest/config';
+import { paraglide } from '@inlang/paraglide-sveltekit/vite';
 
 /*** get info from package.json ***/
 import { readFileSync } from 'fs'
@@ -9,7 +10,13 @@ const json = readFileSync(file, 'utf8');
 const pkg = JSON.parse(json);
 
 export default defineConfig({
-	plugins: [sveltekit()],
+	plugins: [
+		paraglide({
+			project: './project.inlang',
+			outdir: './src/lib/paraglide',
+		  }),
+		  sveltekit()		
+	],
 
 	test: {
 		include: ['src/**/*.{test,spec}.{js,ts}']
