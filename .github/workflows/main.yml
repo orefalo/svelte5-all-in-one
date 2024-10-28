@@ -123,14 +123,14 @@ jobs:
           from PIL import Image
           import os
           
-          # Create a new 32x32 black image
-          img = Image.new("RGB", (32, 32), "black")
+          # Create a new 32x32 black image with alpha channel
+          img = Image.new("RGBA", (32, 32), (0, 0, 0, 255))
           
           # Ensure the directory exists
           os.makedirs("src-tauri/icons", exist_ok=True)
           
-          # Save as PNG
-          img.save("src-tauri/icons/32x32.png")
+          # Save as PNG with alpha channel
+          img.save("src-tauri/icons/32x32.png", "PNG")
           '
 
       # Verify the icon
