@@ -6,7 +6,7 @@
   "version": "0.0.1",
   "type": "module",
   "scripts": {
-    "dev": "vite dev",
+    "dev": "vite dev --host 0.0.0.0",
     "build": "vite build",
     "build-old": "vite build && bun run postbuild",
     "preview": "vite preview",
@@ -23,8 +23,10 @@
     "ios-reload": "cap run ios -l --external --port=5173",
     "android": "bun run build && bunx cap sync && bunx cap update android && bunx cap copy android && bunx cap run android",
     "android-reload": "cap run android -l --external --port=5173",
-	"tauri": "tauri",
-	"build-tauri": "bun run build && tauri build"
+    "tauri": "bunx tauri",
+    "tauri:dev": "cd app/src-tauri; bunx tauri dev",
+    "tauri:build": "bunx tauri build",
+    "build-tauri": "bun run build && tauri build"
   },
   "devDependencies": {
     "@capacitor/cli": "^6.1.2",
@@ -32,7 +34,7 @@
     "@sveltejs/adapter-static": "^3.0.6",
     "@sveltejs/kit": "^2.5.27",
     "@sveltejs/vite-plugin-svelte": "^4.0.0",
-    "@tauri-apps/cli": "1.0.0",
+    "@tauri-apps/cli": "^2.0.4",
     "@types/eslint": "^9.6.0",
     "autoprefixer": "^10.4.20",
     "bits-ui": "^0.21.16",
