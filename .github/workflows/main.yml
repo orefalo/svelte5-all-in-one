@@ -48,9 +48,11 @@ jobs:
       # For the Windows build job, modify the npm installation steps:
       - name: Install frontend dependencies (Windows)
         if: matrix.platform == 'windows-latest'
+        shell: powershell
         run: |
           npm cache clean --force
-          rm -rf node_modules package-lock.json
+          if (Test-Path node_modules) { Remove-Item -Recurse -Force node_modules }
+          if (Test-Path package-lock.json) { Remove-Item -Force package-lock.json }
           npm install -g @rollup/rollup-win32-x64-msvc
           npm install --no-package-lock
 
