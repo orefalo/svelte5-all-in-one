@@ -48,11 +48,17 @@ jobs:
       - name: Install Tauri CLI
         run: npm install -g @tauri-apps/cli
 
+      - name: Create src-tauri directory
+        run: mkdir -p src-tauri
+
       - name: Initialize Tauri
         run: npx tauri init --ci --force
 
       - name: Build the project
         run: npm run build
+
+      - name: Build Tauri App
+        run: npm run tauri build -- ${{ matrix.args }}
 
       - uses: tauri-apps/tauri-action@v0.4.3
         env:
@@ -67,4 +73,4 @@ jobs:
           prerelease: false
           args: ${{ matrix.args }}
           projectPath: '.'
-          distPath: './build'  # Adjust this path to match your project's build output directory
+          distPath: './build'  # Make sure this matches your project's build output directory
