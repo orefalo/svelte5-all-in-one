@@ -120,8 +120,17 @@ jobs:
           cp -r icons_backup/* src-tauri/icons/
           ls -la src-tauri/icons/  # Verify the icons are restored
 
-      # Create new directory structure
+      # Create directory structure
       - name: Create directory structure
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          New-Item -ItemType Directory -Force -Path src-tauri/src
+          New-Item -ItemType Directory -Force -Path src-tauri/icons
+
+      - name: Create directory structure
+        if: runner.os != 'Windows'
+        shell: bash
         run: mkdir -p src-tauri/src src-tauri/icons
 
       # Create Cargo.toml
