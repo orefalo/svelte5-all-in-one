@@ -2,9 +2,7 @@
   "$schema": "../node_modules/@tauri-apps/cli/schema.json",
   "build": {
     "beforeBuildCommand": "",
-    "beforeDevCommand": "",
-    "devPath": "http://localhost:5173",
-    "distDir": "../build"
+    "beforeDevCommand": ""
   },
   "package": {
     "productName": "sv1",
