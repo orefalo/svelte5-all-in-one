@@ -111,28 +111,11 @@ jobs:
           }
           EOF
 
-      # Create icon with a simpler, valid PNG
+      # Create icon with a simpler approach for macOS
       - name: Create icon
         run: |
-          cat > src-tauri/icons/32x32.png << 'EOF'
-          iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAABGdBTUEAALGPC/xhBQAAACBjSFJN
-          AAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAQlBMVEUAAADvnyLvnyLvnyLv
-          nyLvnyLvnyLvnyLvnyLvnyLvnyLvnyLvnyLvnyLvnyLvnyLvnyLvnyLvnyLvnyLvnyL///9Q0dkU
-          AAAAEXRSTlMAEEBwj6/P3++/YJ/fIIBAMO9ey3kAAAABYktHRBJ7vGwAAAAACXBIWXMAAAsTAAAL
-          EwEAmpwYAAAAB3RJTUUH5QwBDhwMHWBQXQAAAJpJREFUOMvF01sOwyAMBNAxYGzM+5H7X7XQqm2a
-          tqhSpf5KLP4YyQZ2JqK9YRPRnkQEABwJeHIOzgUAODvnfSA4JwAIIQQAKaWUAOScMwCUUgoAlFJK
-          AaCUUgCgtdYAYIwxAGCttQBgrLUA4JxzAOC99wAQQggAEGOMAJBSSgCQc84AUEopAFBKKQBQSikA
-          0FprADDGGACw1loA+AJwGBji8siJPAAAACV0RVh0ZGF0ZTpjcmVhdGUAMjAyMS0xMi0wMVQxNDoy
-          ODoxMiswMDowMNhs88EAAAAldEVYdGRhdGU6bW9kaWZ5ADIwMjEtMTItMDFUMTQ6Mjg6MTIrMDA6
-          MDCpMUt9AAAAAElFTkSuQmCC
-          EOF
-
-      # Convert from base64 to binary
-      - name: Convert icon to binary
-        run: |
-          base64 -d src-tauri/icons/32x32.png > src-tauri/icons/32x32_tmp.png
-          mv src-tauri/icons/32x32_tmp.png src-tauri/icons/32x32.png
-          file src-tauri/icons/32x32.png
+          mkdir -p src-tauri/icons
+          echo 'iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAQlBMVEUAAADvnyLvnyLvnyLvnyLvnyLvnyLvnyLvnyLvnyLvnyLvnyLvnyLvnyLvnyLvnyLvnyLvnyLvnyLvnyL///9Q0dkUAAAAEXRSTlMAEEBwj6/P3++/YJ/fIIBAMO9ey3kAAAABYktHRBJ7vGwAAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH5QwBDhwMHWBQXQAAAJpJREFUOMvF01sOwyAMBNAxYGzM+5H7X7XQqm2atqhSpf5KLP4YyQZ2JqK9YRPRnkQEABwJeHIOzgUAODvnfSA4JwAIIQQAKaWUAOScMwCUUgoAlFJKAaCUUgCgtdYAYIwxAGCttQBgrLUA4JxzAOC99wAQQggAEGOMAJBSSgCQc84AUEopAFBKKQBQSikA0FprADDGGACw1loA+AJwGBji8siJPAAAACV0RVh0ZGF0ZTpjcmVhdGUAMjAyMS0xMi0wMVQxNDoyODoxMiswMDowMNhs88EAAAAldEVYdGRhdGU6bW9kaWZ5ADIwMjEtMTItMDFUMTQ6Mjg6MTIrMDA6MDCpMUt9AAAAAElFTkSuQmCC' | base64 -D > src-tauri/icons/32x32.png
 
       # Verify the icon
       - name: Verify icon
