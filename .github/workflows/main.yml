@@ -192,3 +192,19 @@ jobs:
           releaseDraft: true
           prerelease: false
           args: ${{ matrix.args }}
+
+      - name: Create main.rs
+        shell: bash
+        run: |
+          mkdir -p src-tauri/src
+          cat > src-tauri/src/main.rs << 'EOF'
+          #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+
+          fn main() {
+            let context = tauri::generate_context!();
+            tauri::Builder::default()
+              .setup(|_app| Ok(()))
+              .run(context)
+              .expect("error while running tauri application");
+          }
+          EOF
