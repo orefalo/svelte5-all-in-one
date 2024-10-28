@@ -125,13 +125,18 @@ jobs:
         if: runner.os == 'Windows'
         shell: powershell
         run: |
-          New-Item -ItemType Directory -Force -Path src-tauri/src
-          New-Item -ItemType Directory -Force -Path src-tauri/icons
+          if (-not (Test-Path src-tauri/src)) {
+              New-Item -ItemType Directory -Force -Path src-tauri/src
+          }
+          if (-not (Test-Path src-tauri/icons)) {
+              New-Item -ItemType Directory -Force -Path src-tauri/icons
+          }
 
       - name: Create directory structure
         if: runner.os != 'Windows'
         shell: bash
-        run: mkdir -p src-tauri/src src-tauri/icons
+        run: |
+          mkdir -p src-tauri/src src-tauri/icons
 
       # Create Cargo.toml
       - name: Create Cargo.toml
