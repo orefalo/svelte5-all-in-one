@@ -111,10 +111,34 @@ jobs:
           }
           EOF
 
-      # Create icon
+      # Create icon with a simpler, valid PNG
       - name: Create icon
         run: |
-          echo 'iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAB5SURBVFhH7ZBBCsAwCAT9/6fTQ8GTYLKr0BZ6GAIZNaOH9q4557xaa4mI9N77OI7DzFJKKdd1pZRyPxw5Zy2llNZaEhFprWXvfR9+BzAz3vtfQFVRAf8IqCoq4B8BVUUFqCoqQFVRAaqKClBVVICqogJUFRVQVXwD8AYrnifzVVwR3gAAAABJRU5ErkJggg==' | base64 -d > src-tauri/icons/32x32.png
+          cat > src-tauri/icons/32x32.png << 'EOF'
+          iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAABGdBTUEAALGPC/xhBQAAACBjSFJN
+          AAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAQlBMVEUAAADvnyLvnyLvnyLv
+          nyLvnyLvnyLvnyLvnyLvnyLvnyLvnyLvnyLvnyLvnyLvnyLvnyLvnyLvnyLvnyLvnyL///9Q0dkU
+          AAAAEXRSTlMAEEBwj6/P3++/YJ/fIIBAMO9ey3kAAAABYktHRBJ7vGwAAAAACXBIWXMAAAsTAAAL
+          EwEAmpwYAAAAB3RJTUUH5QwBDhwMHWBQXQAAAJpJREFUOMvF01sOwyAMBNAxYGzM+5H7X7XQqm2a
+          tqhSpf5KLP4YyQZ2JqK9YRPRnkQEABwJeHIOzgUAODvnfSA4JwAIIQQAKaWUAOScMwCUUgoAlFJK
+          AaCUUgCgtdYAYIwxAGCttQBgrLUA4JxzAOC99wAQQggAEGOMAJBSSgCQc84AUEopAFBKKQBQSikA
+          0FprADDGGACw1loA+AJwGBji8siJPAAAACV0RVh0ZGF0ZTpjcmVhdGUAMjAyMS0xMi0wMVQxNDoy
+          ODoxMiswMDowMNhs88EAAAAldEVYdGRhdGU6bW9kaWZ5ADIwMjEtMTItMDFUMTQ6Mjg6MTIrMDA6
+          MDCpMUt9AAAAAElFTkSuQmCC
+          EOF
+
+      # Convert from base64 to binary
+      - name: Convert icon to binary
+        run: |
+          base64 -d src-tauri/icons/32x32.png > src-tauri/icons/32x32_tmp.png
+          mv src-tauri/icons/32x32_tmp.png src-tauri/icons/32x32.png
+          file src-tauri/icons/32x32.png
+
+      # Verify the icon
+      - name: Verify icon
+        run: |
+          ls -la src-tauri/icons/32x32.png
+          file src-tauri/icons/32x32.png
 
       # Create tauri.conf.json
       - name: Create tauri.conf.json
