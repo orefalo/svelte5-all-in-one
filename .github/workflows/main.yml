@@ -122,6 +122,93 @@ jobs:
       - name: Build Tauri App
         run: npm run tauri build -- ${{ matrix.args }}
 
+      - name: Create icons directory and files
+        run: |
+          mkdir -p src-tauri/icons
+          # Create a simple 32x32 PNG icon (black square)
+          convert -size 32x32 xc:black src-tauri/icons/32x32.png
+          convert -size 128x128 xc:black src-tauri/icons/128x128.png
+          convert -size 128x128 xc:black src-tauri/icons/icon.png
+
+      - name: Install ImageMagick (for icon creation)
+        if: matrix.platform == 'ubuntu-22.04'
+        run: sudo apt-get install -y imagemagick
+
+      - name: Install ImageMagick (for macOS)
+        if: matrix.platform == 'macos-latest'
+        run: brew install imagemagick
+
+      - name: Install ImageMagick (for Windows)
+        if: matrix.platform == 'windows-latest'
+        run: choco install imagemagick.app
+
+      - name: Create tauri.conf.json
+        run: |
+          cat << EOF > src-tauri/tauri.conf.json
+          {
+            "build": {
+              "beforeBuildCommand": "",
+              "beforeDevCommand": "",
+              "devPath": "../dist",
+              "distDir": "../dist"
+            },
+            "package": {
+              "productName": "sv1",
+              "version": "0.1.0"
+            },
+            "tauri": {
+              "bundle": {
+                "active": true,
+                "category": "DeveloperTool",
+                "copyright": "",
+                "deb": {
+                  "depends": []
+                },
+                "externalBin": [],
+                "icon": [
+                  "icons/32x32.png",
+                  "icons/128x128.png",
+                  "icons/128x128@2x.png",
+                  "icons/icon.icns",
+                  "icons/icon.ico"
+                ],
+                "identifier": "com.tauri.dev",
+                "longDescription": "",
+                "macOS": {
+                  "entitlements": null,
+                  "exceptionDomain": "",
+                  "frameworks": [],
+                  "providerShortName": null,
+                  "signingIdentity": null
+                },
+                "resources": [],
+                "shortDescription": "",
+                "targets": "all",
+                "windows": {
+                  "certificateThumbprint": null,
+                  "digestAlgorithm": "sha256",
+                  "timestampUrl": ""
+                }
+              },
+              "security": {
+                "csp": null
+              },
+              "updater": {
+                "active": false
+              },
+              "windows": [
+                {
+                  "fullscreen": false,
+                  "height": 600,
+                  "resizable": true,
+                  "title": "sv1",
+                  "width": 800
+                }
+              ]
+            }
+          }
+          EOF
+
       - uses: tauri-apps/tauri-action@v0.4.3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
