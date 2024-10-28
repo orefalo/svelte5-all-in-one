@@ -104,22 +104,18 @@ jobs:
         run: |
           cat > src-tauri/tauri.conf.json << 'EOF'
           {
+            "$schema": "https://raw.githubusercontent.com/tauri-apps/tauri/dev/tooling/cli/schema.json",
+            "identifier": "com.tauri.dev",
+            "productName": "sv1",
+            "version": "0.1.0",
             "build": {
-              "beforeBuildCommand": "",
-              "beforeDevCommand": "",
-              "devPath": "../dist",
-              "distDir": "../dist"
-            },
-            "package": {
-              "productName": "sv1",
-              "version": "0.1.0"
-            },
-            "tauri": {
-              "bundle": {
-                "active": true,
-                "icon": ["icons/32x32.png"],
-                "identifier": "com.tauri.dev"
+              "frontend": {
+                "build": "",
+                "dev": ""
               },
+              "dist": "../dist"
+            },
+            "app": {
               "windows": [
                 {
                   "fullscreen": false,
@@ -128,7 +124,15 @@ jobs:
                   "title": "sv1",
                   "width": 800
                 }
-              ]
+              ],
+              "security": {
+                "csp": null
+              }
+            },
+            "bundle": {
+              "active": true,
+              "icon": ["icons/32x32.png"],
+              "targets": ["app", "deb", "dmg", "updater"]
             }
           }
           EOF
