@@ -291,6 +291,14 @@ jobs:
 
       # Verify the icon
       - name: Verify icon
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          Get-ChildItem -Path src-tauri/icons/32x32.png -Force | Select-Object FullName, Length, LastWriteTime
+
+      - name: Verify icon
+        if: runner.os != 'Windows'
+        shell: bash
         run: |
           ls -la src-tauri/icons/32x32.png
           file src-tauri/icons/32x32.png
