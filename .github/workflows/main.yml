@@ -15,12 +15,12 @@ jobs:
         include:
           - platform: 'macos-latest'
             args: '--target aarch64-apple-darwin'
-          - platform: 'macos-latest'
-            args: '--target x86_64-apple-darwin'
-          - platform: 'ubuntu-22.04'
-            args: ''
-          - platform: 'windows-latest'
-            args: ''
+          #- platform: 'macos-latest'
+          #  args: '--target x86_64-apple-darwin'
+          #- platform: 'ubuntu-22.04'
+          #  args: ''
+          #- platform: 'windows-latest'
+          #  args: ''
 
     runs-on: ${{ matrix.platform }}
     steps:
@@ -255,7 +255,7 @@ jobs:
           npm ci --force
           npm run build
 
-      # Create build directory with the built files
+      # Create tauri.conf.json using existing icons
       - name: Create tauri.conf.json
         run: |
           cat > src-tauri/tauri.conf.json << 'EOF'
@@ -285,7 +285,13 @@ jobs:
             },
             "bundle": {
               "active": true,
-              "icon": ["icons/32x32.png"],
+              "icon": [
+                "icons/32x32.png",
+                "icons/128x128.png",
+                "icons/128x128@2x.png",
+                "icons/icon.icns",
+                "icons/icon.ico"
+              ],
               "category": "DeveloperTool",
               "copyright": "",
               "macOS": {
