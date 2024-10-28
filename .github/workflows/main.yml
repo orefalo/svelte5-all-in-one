@@ -111,11 +111,27 @@ jobs:
           }
           EOF
 
-      # Create icon with a simpler approach for macOS
+      # Create a simple PNG icon using Python (which is available on the runner)
       - name: Create icon
         run: |
           mkdir -p src-tauri/icons
-          echo 'iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAQlBMVEUAAADvnyLvnyLvnyLvnyLvnyLvnyLvnyLvnyLvnyLvnyLvnyLvnyLvnyLvnyLvnyLvnyLvnyLvnyLvnyL///9Q0dkUAAAAEXRSTlMAEEBwj6/P3++/YJ/fIIBAMO9ey3kAAAABYktHRBJ7vGwAAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH5QwBDhwMHWBQXQAAAJpJREFUOMvF01sOwyAMBNAxYGzM+5H7X7XQqm2atqhSpf5KLP4YyQZ2JqK9YRPRnkQEABwJeHIOzgUAODvnfSA4JwAIIQQAKaWUAOScMwCUUgoAlFJKAaCUUgCgtdYAYIwxAGCttQBgrLUA4JxzAOC99wAQQggAEGOMAJBSSgCQc84AUEopAFBKKQBQSikA0FprADDGGACw1loA+AJwGBji8siJPAAAACV0RVh0ZGF0ZTpjcmVhdGUAMjAyMS0xMi0wMVQxNDoyODoxMiswMDowMNhs88EAAAAldEVYdGRhdGU6bW9kaWZ5ADIwMjEtMTItMDFUMTQ6Mjg6MTIrMDA6MDCpMUt9AAAAAElFTkSuQmCC' | base64 -D > src-tauri/icons/32x32.png
+          python3 -c '
+          from PIL import Image
+          import os
+          
+          # Create a new 32x32 black image
+          img = Image.new("RGB", (32, 32), "black")
+          
+          # Ensure the directory exists
+          os.makedirs("src-tauri/icons", exist_ok=True)
+          
+          # Save as PNG
+          img.save("src-tauri/icons/32x32.png")
+          '
+
+      # Install Pillow if needed
+      - name: Install Pillow
+        run: pip3 install Pillow
 
       # Verify the icon
       - name: Verify icon
