@@ -248,50 +248,6 @@ jobs:
           }
           EOF
 
-      # Install Pillow with the necessary flag
-      - name: Install Pillow
-        run: python3 -m pip install --break-system-packages Pillow
-
-      # Then create the icon
-      - name: Create icon
-        if: runner.os == 'Windows'
-        shell: powershell
-        run: |
-          $pythonScript = @"
-          from PIL import Image
-          import os
-          
-          # Ensure directory exists
-          os.makedirs('src-tauri/icons', exist_ok=True)
-          
-          # Create a new 32x32 black image with alpha channel
-          img = Image.new('RGBA', (32, 32), (0, 0, 0, 255))
-          
-          # Save as PNG with alpha channel
-          img.save('src-tauri/icons/32x32.png', 'PNG')
-          "@
-          
-          $pythonScript | Out-File -Encoding UTF8 "create_icon.py"
-          python3 "create_icon.py"
-
-      - name: Create icon
-        if: runner.os != 'Windows'
-        shell: bash
-        run: |
-          python3 -c '
-          from PIL import Image
-          import os
-          
-          # Create a new 32x32 black image with alpha channel
-          img = Image.new("RGBA", (32, 32), (0, 0, 0, 255))
-          
-          # Ensure the directory exists
-          os.makedirs("src-tauri/icons", exist_ok=True)
-          
-          # Save as PNG with alpha channel
-          img.save("src-tauri/icons/32x32.png", "PNG")
-          '
-
       # Verify the icon
       - name: Verify icon
         if: runner.os == 'Windows'
