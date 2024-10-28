@@ -111,7 +111,11 @@ jobs:
           }
           EOF
 
-      # Create a simple PNG icon using Python (which is available on the runner)
+      # Install Pillow first
+      - name: Install Pillow
+        run: pip3 install Pillow
+
+      # Then create the icon
       - name: Create icon
         run: |
           mkdir -p src-tauri/icons
@@ -128,10 +132,6 @@ jobs:
           # Save as PNG
           img.save("src-tauri/icons/32x32.png")
           '
-
-      # Install Pillow if needed
-      - name: Install Pillow
-        run: pip3 install Pillow
 
       # Verify the icon
       - name: Verify icon
