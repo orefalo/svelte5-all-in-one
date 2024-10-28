@@ -45,7 +45,17 @@ jobs:
       - name: Install Tauri CLI
         run: npm install -g @tauri-apps/cli
   
-      - name: install frontend dependencies
+      # For the Windows build job, modify the npm installation steps:
+      - name: Install frontend dependencies (Windows)
+        if: matrix.platform == 'windows-latest'
+        run: |
+          npm cache clean --force
+          rm -rf node_modules package-lock.json
+          npm install -g @rollup/rollup-win32-x64-msvc
+          npm install --no-package-lock
+
+      - name: Install frontend dependencies (non-Windows)
+        if: matrix.platform != 'windows-latest'
         run: npm ci --force
 
       - name: Install Tauri CLI

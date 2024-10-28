@@ -61,7 +61,11 @@
     "@capacitor/android": "^6.1.2",
     "@capacitor/core": "^6.1.2",
     "@capacitor/ios": "^6.1.2",
-    "@inlang/paraglide-sveltekit": "^0.11.1"
+    "@inlang/paraglide-sveltekit": "^0.11.1",
+    "rollup": "^4.x.x"
+  },
+  "optionalDependencies": {
+    "@rollup/rollup-win32-x64-msvc": "^4.x.x"
   },
   "overrides": {
     "vite": {
