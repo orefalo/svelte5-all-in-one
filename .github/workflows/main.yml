@@ -48,6 +48,9 @@ jobs:
       - name: Install Tauri CLI
         run: npm install -g @tauri-apps/cli
 
+      - name: Initialize Tauri
+        run: npx tauri init --ci
+
       - name: Build the project
         run: npm run build
 
@@ -56,7 +59,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
-          TAURI_SCRIPT_COMMAND: npm
         with:
           tagName: app-v__VERSION__
           releaseName: 'App v__VERSION__'
@@ -65,5 +67,4 @@ jobs:
           prerelease: false
           args: ${{ matrix.args }}
           projectPath: '.'
-          distPath: '../dist'
-          packageManager: npm
+          distPath: './build'  # Adjust this path to match your project's build output directory
