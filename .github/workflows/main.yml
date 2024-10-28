@@ -67,6 +67,7 @@ jobs:
           default-run = "sv1"
           edition = "2021"
           rust-version = "1.60"
+          build = "build.rs"
 
           [build-dependencies]
           tauri-build = { version = "2.0.0-rc.13", features = [] }
@@ -78,6 +79,30 @@ jobs:
 
           [features]
           custom-protocol = [ "tauri/custom-protocol" ]
+          EOF
+
+      - name: Create build.rs
+        run: |
+          cat << EOF > src-tauri/build.rs
+          fn main() {
+            tauri_build::build()
+          }
+          EOF
+
+      - name: Create main.rs
+        run: |
+          mkdir -p src-tauri/src
+          cat << EOF > src-tauri/src/main.rs
+          // Prevents additional console window on Windows in release
+          #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+
+          use tauri::Manager;
+
+          fn main() {
+            tauri::Builder::default()
+              .run(tauri::generate_context!())
+              .expect("error while running tauri application");
+          }
           EOF
 
       - name: Display Cargo.toml contents
