@@ -149,6 +149,14 @@ jobs:
           echo "VERSION=$version" >> $GITHUB_ENV
           echo "Version from package.json: $version"
 
+      - name: Get PACKAGE_NAME from package.json
+        id: package-name
+        shell: bash
+        run: |
+          package_name=$(node -p "require('./package.json').name")
+          echo "PACKAGE_NAME=$package_name" >> $GITHUB_ENV
+          echo "Name from package.json: $package_name"
+
       # Create Cargo.toml
       - name: Create Cargo.toml
         if: runner.os == 'Windows'
@@ -156,13 +164,13 @@ jobs:
         run: |
           $content = @'
           [package]
-          name = "sv1"
+          name = "${{ env.PACKAGE_NAME }}"
           version = "${{ env.VERSION }}"
           description = "A Tauri App"
           authors = ["you"]
           license = ""
           repository = ""
-          default-run = "sv1"
+          default-run = "${{ env.PACKAGE_NAME }}"
           edition = "2021"
           rust-version = "1.60"
           build = "build.rs"
@@ -186,13 +194,13 @@ jobs:
         run: |
           cat > src-tauri/Cargo.toml << 'EOF'
           [package]
-          name = "sv1"
+          name = "${{ env.PACKAGE_NAME }}"
           version = "${{ env.VERSION }}"
           description = "A Tauri App"
           authors = ["you"]
           license = ""
           repository = ""
-          default-run = "sv1"
+          default-run = "${{ env.PACKAGE_NAME }}"
           edition = "2021"
           rust-version = "1.60"
           build = "build.rs"
@@ -283,7 +291,7 @@ jobs:
           {
             "$schema": "https://raw.githubusercontent.com/tauri-apps/tauri/dev/tooling/cli/schema.json",
             "identifier": "com.example.sv1",
-            "productName": "sv1",
+            "productName": "${{ env.PACKAGE_NAME }}",
             "version": "${{ env.VERSION }}",
             "build": {
               "beforeBuildCommand": "npm run build",
@@ -296,7 +304,7 @@ jobs:
                   "fullscreen": false,
                   "height": 600,
                   "resizable": true,
-                  "title": "sv1",
+                  "title": "${{ env.PACKAGE_NAME }}",
                   "width": 800
                 }
               ],
@@ -331,7 +339,7 @@ jobs:
           {
             "$schema": "https://raw.githubusercontent.com/tauri-apps/tauri/dev/tooling/cli/schema.json",
             "identifier": "com.example.sv1",
-            "productName": "sv1",
+            "productName": "${{ env.PACKAGE_NAME }}",
             "version": "${{ env.VERSION }}",
             "build": {
               "beforeBuildCommand": "npm run build",
@@ -344,7 +352,7 @@ jobs:
                   "fullscreen": false,
                   "height": 600,
                   "resizable": true,
-                  "title": "sv1",
+                  "title": "${{ env.PACKAGE_NAME }}",
                   "width": 800
                 }
               ],
