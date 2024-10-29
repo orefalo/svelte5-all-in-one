@@ -27,3 +27,7 @@ fi
 git push origin release
 
 echo "Changes from main branch have been successfully merged into release branch."
+
+git checkout main
+
+echo "checkout main -- so we're back on the main branch"
