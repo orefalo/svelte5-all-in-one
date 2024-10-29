@@ -157,6 +157,14 @@ jobs:
           echo "PACKAGE_NAME=$package_name" >> $GITHUB_ENV
           echo "Name from package.json: $package_name"
 
+      - name: Get PACKAGE_IDENTIFIER from package.json
+        id: package-identifier
+        shell: bash
+        run: |
+          package_identifier=$(node -p "require('./package.json').identifier")
+          echo "PACKAGE_IDENTIFIER=$package_identifier" >> $GITHUB_ENV
+          echo "Indentifier from package.json: $package_identifier"
+
       # Create Cargo.toml
       - name: Create Cargo.toml
         if: runner.os == 'Windows'
@@ -290,7 +298,7 @@ jobs:
           $content = @'
           {
             "$schema": "https://raw.githubusercontent.com/tauri-apps/tauri/dev/tooling/cli/schema.json",
-            "identifier": "com.example.sv1",
+            "identifier": "${{ env.PACKAGE_IDENTIFIER }}",
             "productName": "${{ env.PACKAGE_NAME }}",
             "version": "${{ env.VERSION }}",
             "build": {
@@ -338,7 +346,7 @@ jobs:
           cat > src-tauri/tauri.conf.json << 'EOF'
           {
             "$schema": "https://raw.githubusercontent.com/tauri-apps/tauri/dev/tooling/cli/schema.json",
-            "identifier": "com.example.sv1",
+            "identifier": "${{ env.PACKAGE_IDENTIFIER }}",
             "productName": "${{ env.PACKAGE_NAME }}",
             "version": "${{ env.VERSION }}",
             "build": {
