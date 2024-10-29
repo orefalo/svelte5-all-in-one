@@ -9,6 +9,7 @@ cp static/icon-32.png src-tauri/icons/32x32.png
 cp static/icon-128.png src-tauri/icons/128x128.png
 cp static/icon-128.png src-tauri/icons/128x128@2x.png
 cp static/icon-256.png src-tauri/icons/icon.icns
-cp static/icon-256.png src-tauri/icons/icon.ico
+convert static/icon-16.png static/icon-32.png static/icon-48.png static/icon-64.png static/icon-128.png static/icon-256.png src-tauri/icons/icon.ico
+#cp static/icon-256.png src-tauri/icons/icon.ico
 
 echo "Icons copied successfully for Tauri!"
