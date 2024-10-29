@@ -3,7 +3,8 @@
   "title": "app title here",
   "homepage": "https://example.com",
   "description": "app description here",
-  "version": "0.4.0",
+  "version": "0.5.0",
+  "identifier": "com.mycompany.sv1demo",
   "type": "module",
   "scripts": {
     "dev": "vite dev --host 0.0.0.0",
