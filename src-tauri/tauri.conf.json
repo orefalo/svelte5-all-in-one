@@ -49,5 +49,18 @@
       "digestAlgorithm": "sha256",
       "timestampUrl": ""
     }
+  },
+  "tauri": {
+    "bundle": {
+      "identifier": "com.mycompany.sv1demo",
+      "macOS": {
+        "signingIdentity": "Developer ID Application: Mantis Bible Company (HEGN9W2S9J)",
+        "entitlements": null,
+        "exceptionDomain": null,
+        "frameworks": [],
+        "minimumSystemVersion": null,
+        "providerShortName": "TEAMID"
+      }
+    }
   }
 }
