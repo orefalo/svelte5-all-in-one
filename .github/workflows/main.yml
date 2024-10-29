@@ -15,12 +15,12 @@ jobs:
         include:
           - platform: 'macos-latest'
             args: '--target aarch64-apple-darwin'
-          #- platform: 'macos-latest'
-          #  args: '--target x86_64-apple-darwin'
-          #- platform: 'ubuntu-22.04'
-          #  args: ''
-          #- platform: 'windows-latest'
-          #  args: ''
+          - platform: 'macos-latest'
+            args: '--target x86_64-apple-darwin'
+          - platform: 'ubuntu-22.04'
+            args: ''
+          - platform: 'windows-latest'
+            args: ''
 
     runs-on: ${{ matrix.platform }}
     steps:
@@ -45,45 +45,149 @@ jobs:
       - name: Install Tauri CLI
         run: npm install -g @tauri-apps/cli
   
-      - name: install frontend dependencies
+      # For the Windows build job, modify the npm installation steps:
+      - name: Install frontend dependencies (Windows)
+        if: matrix.platform == 'windows-latest'
+        shell: powershell
+        run: |
+          npm cache clean --force
+          if (Test-Path node_modules) { Remove-Item -Recurse -Force node_modules }
+          if (Test-Path package-lock.json) { Remove-Item -Force package-lock.json }
+          npm install -g @rollup/rollup-win32-x64-msvc
+          npm install --no-package-lock
+
+      - name: Install frontend dependencies (non-Windows)
+        if: matrix.platform != 'windows-latest'
         run: npm ci --force
 
-      - name: Install Tauri CLI
-        run: npm install -g @tauri-apps/cli
+      - name: Clean Cargo cache (Windows)
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          if (Test-Path src-tauri/Cargo.lock) { Remove-Item -Force src-tauri/Cargo.lock }
+          if (Test-Path src-tauri/target) { Remove-Item -Recurse -Force src-tauri/target }
 
-      - name: Clean Cargo cache
+      - name: Clean Cargo cache (non-Windows)
+        if: runner.os != 'Windows'
         run: |
           rm -f src-tauri/Cargo.lock
           rm -rf src-tauri/target
 
-      # Before cleaning src-tauri, backup the icons
+      # Backup icons
       - name: Backup icons
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          New-Item -ItemType Directory -Force -Path icons_backup
+          Copy-Item -Path "src-tauri/icons/*" -Destination icons_backup -Recurse -Force
+          Get-ChildItem icons_backup  # Verify the backup
+
+      - name: Backup icons
+        if: runner.os != 'Windows'
+        shell: bash
         run: |
           mkdir -p icons_backup
           cp -r src-tauri/icons/* icons_backup/
 
-      # Start fresh by removing the entire src-tauri directory
+      # Clean src-tauri directory
       - name: Clean src-tauri
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          if (Test-Path src-tauri) { Remove-Item -Recurse -Force src-tauri }
+
+      - name: Clean src-tauri
+        if: runner.os != 'Windows'
+        shell: bash
         run: rm -rf src-tauri
 
-      # After creating the src-tauri directory structure, restore the icons
+      # Restore icons
       - name: Restore icons
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          New-Item -ItemType Directory -Force -Path src-tauri/icons
+          Copy-Item -Path "icons_backup/*" -Destination src-tauri/icons -Recurse -Force
+          Get-ChildItem src-tauri/icons  # Verify the icons are restored
+          if (-not (Test-Path "src-tauri/icons/icon.ico")) {
+            Write-Error "icon.ico not found after restore!"
+            exit 1
+          }
+
+      - name: Restore icons
+        if: runner.os != 'Windows'
+        shell: bash
         run: |
           mkdir -p src-tauri/icons
           cp -r icons_backup/* src-tauri/icons/
           ls -la src-tauri/icons/  # Verify the icons are restored
 
-      # Create new directory structure
+      # Create directory structure
       - name: Create directory structure
-        run: mkdir -p src-tauri/src src-tauri/icons
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          if (-not (Test-Path src-tauri/src)) {
+              New-Item -ItemType Directory -Force -Path src-tauri/src
+          }
+          if (-not (Test-Path src-tauri/icons)) {
+              New-Item -ItemType Directory -Force -Path src-tauri/icons
+          }
+
+      - name: Create directory structure
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          mkdir -p src-tauri/src src-tauri/icons
+
+      # Add this step after checkout and before creating files
+      - name: Get version from package.json
+        id: package-version
+        shell: bash
+        run: |
+          version=$(node -p "require('./package.json').version")
+          echo "VERSION=$version" >> $GITHUB_ENV
+          echo "Version from package.json: $version"
 
       # Create Cargo.toml
       - name: Create Cargo.toml
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          $content = @'
+          [package]
+          name = "sv1"
+          version = "${{ env.VERSION }}"
+          description = "A Tauri App"
+          authors = ["you"]
+          license = ""
+          repository = ""
+          default-run = "sv1"
+          edition = "2021"
+          rust-version = "1.60"
+          build = "build.rs"
+
+          [build-dependencies]
+          tauri-build = { version = "2.0.0-rc.13", features = [] }
+
+          [dependencies]
+          serde_json = "1.0"
+          serde = { version = "1.0", features = ["derive"] }
+          tauri = { version = "2.0.0-rc.13" }
+
+          [features]
+          custom-protocol = [ "tauri/custom-protocol" ]
+          '@
+          Set-Content -Path "src-tauri/Cargo.toml" -Value $content
+
+      - name: Create Cargo.toml
+        if: runner.os != 'Windows'
+        shell: bash
         run: |
           cat > src-tauri/Cargo.toml << 'EOF'
           [package]
           name = "sv1"
-          version = "0.3.0"
+          version = "${{ env.VERSION }}"
           description = "A Tauri App"
           authors = ["you"]
           license = ""
@@ -107,6 +211,18 @@ jobs:
 
       # Create build.rs
       - name: Create build.rs
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          $content = @'
+          fn main() {
+            tauri_build::build()
+          }
+          '@
+          Set-Content -Path "src-tauri/build.rs" -Value $content
+
+      - name: Create build.rs
+        if: runner.os != 'Windows'
         run: |
           cat > src-tauri/build.rs << 'EOF'
           fn main() {
@@ -116,6 +232,23 @@ jobs:
 
       # Create main.rs
       - name: Create main.rs
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          $content = @'
+          #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
+
+          fn main() {
+            tauri::Builder::default()
+              .run(tauri::generate_context!())
+              .expect("error while running tauri application");
+          }
+          '@
+          New-Item -ItemType Directory -Force -Path src-tauri/src
+          Set-Content -Path "src-tauri/src/main.rs" -Value $content
+
+      - name: Create main.rs
+        if: runner.os != 'Windows'
         run: |
           cat > src-tauri/src/main.rs << 'EOF'
           #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
@@ -127,43 +260,31 @@ jobs:
           }
           EOF
 
-      # Install Pillow with the necessary flag
-      - name: Install Pillow
-        run: python3 -m pip install --break-system-packages Pillow
-
-      # Then create the icon
-      - name: Create icon
-        run: |
-          mkdir -p src-tauri/icons
-          python3 -c '
-          from PIL import Image
-          import os
-          
-          # Create a new 32x32 black image with alpha channel
-          img = Image.new("RGBA", (32, 32), (0, 0, 0, 255))
-          
-          # Ensure the directory exists
-          os.makedirs("src-tauri/icons", exist_ok=True)
-          
-          # Save as PNG with alpha channel
-          img.save("src-tauri/icons/32x32.png", "PNG")
-          '
-
       # Verify the icon
       - name: Verify icon
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          Get-ChildItem -Path src-tauri/icons/32x32.png -Force | Select-Object FullName, Length, LastWriteTime
+
+      - name: Verify icon
+        if: runner.os != 'Windows'
+        shell: bash
         run: |
           ls -la src-tauri/icons/32x32.png
           file src-tauri/icons/32x32.png
 
-      # Create tauri.conf.json
-      - name: Create tauri.conf.json
+      # Create tauri.conf.json (Windows)
+      - name: Create tauri.conf.json (Windows)
+        if: runner.os == 'Windows'
+        shell: powershell
         run: |
-          cat > src-tauri/tauri.conf.json << 'EOF'
+          $content = @'
           {
             "$schema": "https://raw.githubusercontent.com/tauri-apps/tauri/dev/tooling/cli/schema.json",
             "identifier": "com.example.sv1",
             "productName": "sv1",
-            "version": "0.3.0",
+            "version": "${{ env.VERSION }}",
             "build": {
               "beforeBuildCommand": "npm run build",
               "beforeDevCommand": "npm run dev",
@@ -186,11 +307,55 @@ jobs:
             "bundle": {
               "active": true,
               "icon": [
-                "icons/32x32.png",
-                "icons/128x128.png",
-                "icons/128x128@2x.png",
-                "icons/icon.icns",
-                "icons/icon.ico"
+                "icons/32x32.png"
+              ],
+              "category": "DeveloperTool",
+              "copyright": "",
+              "macOS": {
+                "entitlements": "entitlements.plist",
+                "exceptionDomain": "",
+                "frameworks": [],
+                "providerShortName": null,
+                "signingIdentity": null
+              }
+            }
+          }
+          '@
+          Set-Content -Path "src-tauri/tauri.conf.json" -Value $content
+
+      - name: Create tauri.conf.json (non-Windows)
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          cat > src-tauri/tauri.conf.json << 'EOF'
+          {
+            "$schema": "https://raw.githubusercontent.com/tauri-apps/tauri/dev/tooling/cli/schema.json",
+            "identifier": "com.example.sv1",
+            "productName": "sv1",
+            "version": "${{ env.VERSION }}",
+            "build": {
+              "beforeBuildCommand": "npm run build",
+              "beforeDevCommand": "npm run dev",
+              "frontendDist": "../build"
+            },
+            "app": {
+              "windows": [
+                {
+                  "fullscreen": false,
+                  "height": 600,
+                  "resizable": true,
+                  "title": "sv1",
+                  "width": 800
+                }
+              ],
+              "security": {
+                "csp": null
+              }
+            },
+            "bundle": {
+              "active": true,
+              "icon": [
+                "icons/32x32.png"
               ],
               "category": "DeveloperTool",
               "copyright": "",
@@ -206,122 +371,84 @@ jobs:
           EOF
 
       # Install frontend dependencies and build the app
-      - name: Install and build frontend
+      - name: Install and build frontend (Windows)
+        if: runner.os == 'Windows'
+        shell: powershell
         run: |
           npm ci --force
           npm run build
+          Get-ChildItem -Path build -Force | Select-Object Name, Length, LastWriteTime
+
+      - name: Install and build frontend (non-Windows)
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          npm ci --force
+          npm run build
+          ls -la build
+
+      # Verify build output
+      - name: Verify build output
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          if (Test-Path build) {
+            Get-ChildItem -Path build -Force | Select-Object Name, Length, LastWriteTime
+          } else {
+            Write-Error "Build directory not found!"
+            exit 1
+          }
+
+      - name: Verify build output
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
           ls -la build  # Verify the build output
 
-      # Create tauri.conf.json with correct frontendDist
-      - name: Create tauri.conf.json
+      # Add these debug steps right before the Tauri build action
+      - name: Debug Icon Path (Windows)
+        if: runner.os == 'Windows'
+        shell: powershell
         run: |
-          cat > src-tauri/tauri.conf.json << 'EOF'
-          {
-            "$schema": "https://raw.githubusercontent.com/tauri-apps/tauri/dev/tooling/cli/schema.json",
-            "identifier": "com.example.sv1",
-            "productName": "sv1",
-            "version": "0.3.0",
-            "build": {
-              "beforeBuildCommand": "npm run build",
-              "beforeDevCommand": "npm run dev",
-              "frontendDist": "../build"
-            },
-            "app": {
-              "windows": [
-                {
-                  "fullscreen": false,
-                  "height": 600,
-                  "resizable": true,
-                  "title": "sv1",
-                  "width": 800
-                }
-              ],
-              "security": {
-                "csp": null
-              }
-            },
-            "bundle": {
-              "active": true,
-              "icon": [
-                "icons/32x32.png",
-                "icons/128x128.png",
-                "icons/128x128@2x.png",
-                "icons/icon.icns",
-                "icons/icon.ico"
-              ],
-              "category": "DeveloperTool",
-              "copyright": "",
-              "macOS": {
-                "entitlements": "entitlements.plist",
-                "exceptionDomain": "",
-                "frameworks": [],
-                "providerShortName": null,
-                "signingIdentity": null
-              }
-            }
+          Write-Host "Current Directory: $(Get-Location)"
+          Write-Host "Checking src-tauri/icons directory:"
+          Get-ChildItem -Path "src-tauri/icons" -Force -Recurse
+          Write-Host "Checking icon.ico specifically:"
+          if (Test-Path "src-tauri/icons/icon.ico") {
+            $icon = Get-Item "src-tauri/icons/icon.ico"
+            Write-Host "Icon exists: $($icon.FullName)"
+            Write-Host "Icon size: $($icon.Length) bytes"
+            Write-Host "Last modified: $($icon.LastWriteTime)"
+          } else {
+            Write-Host "icon.ico not found!"
           }
-          EOF
+          Write-Host "Checking tauri.conf.json:"
+          Get-Content "src-tauri/tauri.conf.json"
 
-      # ... continue with build steps ...
+      # Modify the tauri.conf.json to use absolute path
+      - name: Update tauri.conf.json icon path (Windows)
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          $iconPath = (Resolve-Path "src-tauri/icons/icon.ico").Path
+          $content = Get-Content "src-tauri/tauri.conf.json" -Raw
+          $json = $content | ConvertFrom-Json
+          $json.bundle.icon = @($iconPath)
+          $json | ConvertTo-Json -Depth 32 | Set-Content "src-tauri/tauri.conf.json"
+          Write-Host "Updated tauri.conf.json with absolute icon path:"
+          Get-Content "src-tauri/tauri.conf.json"
 
+      # Then continue with your existing Tauri build action
       - uses: tauri-apps/tauri-action@v0.4.3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
         with:
-          packageManager: npm
-          tagName: app-v__VERSION__ # the action automatically replaces \_\_VERSION\_\_ with the app version.
-          releaseName: 'App v__VERSION__'
+          tagName: app-v${{ env.VERSION }}
+          releaseName: 'App v${{ env.VERSION }}'
           releaseBody: 'See the assets to download this version and install.'
           releaseDraft: true
           prerelease: false
           args: ${{ matrix.args }}
 
-      # Clean up any existing files
-      - name: Clean Rust files
-        run: |
-          rm -rf src-tauri/src
-          rm -f src-tauri/Cargo.lock
-          rm -rf src-tauri/target
-
-      # Create main.rs with absolutely minimal configuration
-      - name: Create main.rs
-        shell: bash
-        run: |
-          mkdir -p src-tauri/src
-          cat > src-tauri/src/main.rs << 'EOF'
-          #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
-
-          fn main() {
-            tauri::Builder::default()
-              .run(tauri::generate_context!())
-              .expect("error while running tauri application");
-          }
-          EOF
-
-      # Verify the content of main.rs
-      - name: Verify main.rs content
-        run: cat src-tauri/src/main.rs
-
-      # Add this step after creating the tauri.conf.json
-      - name: Create entitlements.plist
-        run: |
-          cat > src-tauri/entitlements.plist << 'EOF'
-          <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-          <plist version="1.0">
-          <dict>
-              <key>com.apple.security.cs.allow-jit</key>
-              <true/>
-              <key>com.apple.security.cs.allow-unsigned-executable-memory</key>
-              <true/>
-              <key>com.apple.security.cs.disable-library-validation</key>
-              <true/>
-              <key>com.apple.security.cs.allow-dyld-environment-variables</key>
-              <true/>
-              <key>com.apple.security.get-task-allow</key>
-              <true/>
-          </dict>
-          </plist>
-          EOF

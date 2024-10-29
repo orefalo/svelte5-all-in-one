@@ -3,7 +3,7 @@
   "title": "app title here",
   "homepage": "https://example.com",
   "description": "app description here",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "type": "module",
   "scripts": {
     "dev": "vite dev --host 0.0.0.0",
@@ -61,7 +61,11 @@
     "@capacitor/android": "^6.1.2",
     "@capacitor/core": "^6.1.2",
     "@capacitor/ios": "^6.1.2",
-    "@inlang/paraglide-sveltekit": "^0.11.1"
+    "@inlang/paraglide-sveltekit": "^0.11.1",
+    "rollup": "^4.x.x"
+  },
+  "optionalDependencies": {
+    "@rollup/rollup-win32-x64-msvc": "^4.x.x"
   },
   "overrides": {
     "vite": {
