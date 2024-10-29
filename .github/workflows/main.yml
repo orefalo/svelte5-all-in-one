@@ -13,14 +13,14 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          #- platform: 'macos-latest'
-          #  args: '--target aarch64-apple-darwin'
-          #- platform: 'macos-latest'
-          #  args: '--target x86_64-apple-darwin'
+          - platform: 'macos-latest'
+            args: '--target aarch64-apple-darwin'
+          - platform: 'macos-latest'
+            args: '--target x86_64-apple-darwin'
           - platform: 'ubuntu-22.04'
             args: ''
-          #- platform: 'windows-latest'
-          #  args: ''
+          - platform: 'windows-latest'
+            args: ''
 
     runs-on: ${{ matrix.platform }}
     steps:
@@ -148,7 +148,7 @@ jobs:
           $content = @'
           [package]
           name = "sv1"
-          version = "0.3.0"
+          version = "__VERSION__"
           description = "A Tauri App"
           authors = ["you"]
           license = ""
@@ -178,7 +178,7 @@ jobs:
           cat > src-tauri/Cargo.toml << 'EOF'
           [package]
           name = "sv1"
-          version = "0.3.0"
+          version = "__VERSION__"
           description = "A Tauri App"
           authors = ["you"]
           license = ""
@@ -275,7 +275,7 @@ jobs:
             "$schema": "https://raw.githubusercontent.com/tauri-apps/tauri/dev/tooling/cli/schema.json",
             "identifier": "com.example.sv1",
             "productName": "sv1",
-            "version": "0.3.0",
+            "version": "__VERSION__",
             "build": {
               "beforeBuildCommand": "npm run build",
               "beforeDevCommand": "npm run dev",
@@ -323,7 +323,7 @@ jobs:
             "$schema": "https://raw.githubusercontent.com/tauri-apps/tauri/dev/tooling/cli/schema.json",
             "identifier": "com.example.sv1",
             "productName": "sv1",
-            "version": "0.3.0",
+            "version": "__VERSION__",
             "build": {
               "beforeBuildCommand": "npm run build",
               "beforeDevCommand": "npm run dev",
