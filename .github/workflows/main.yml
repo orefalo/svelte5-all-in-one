@@ -396,14 +396,47 @@ jobs:
         run: |
           ls -la build  # Verify the build output
 
-      # Add this after the build verification steps
+      # Add these debug steps right before the Tauri build action
+      - name: Debug Icon Path (Windows)
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          Write-Host "Current Directory: $(Get-Location)"
+          Write-Host "Checking src-tauri/icons directory:"
+          Get-ChildItem -Path "src-tauri/icons" -Force -Recurse
+          Write-Host "Checking icon.ico specifically:"
+          if (Test-Path "src-tauri/icons/icon.ico") {
+            $icon = Get-Item "src-tauri/icons/icon.ico"
+            Write-Host "Icon exists: $($icon.FullName)"
+            Write-Host "Icon size: $($icon.Length) bytes"
+            Write-Host "Last modified: $($icon.LastWriteTime)"
+          } else {
+            Write-Host "icon.ico not found!"
+          }
+          Write-Host "Checking tauri.conf.json:"
+          Get-Content "src-tauri/tauri.conf.json"
+
+      # Modify the tauri.conf.json to use absolute path
+      - name: Update tauri.conf.json icon path (Windows)
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          $iconPath = (Resolve-Path "src-tauri/icons/icon.ico").Path
+          $content = Get-Content "src-tauri/tauri.conf.json" -Raw
+          $json = $content | ConvertFrom-Json
+          $json.bundle.icon = @($iconPath)
+          $json | ConvertTo-Json -Depth 32 | Set-Content "src-tauri/tauri.conf.json"
+          Write-Host "Updated tauri.conf.json with absolute icon path:"
+          Get-Content "src-tauri/tauri.conf.json"
+
+      # Then continue with your existing Tauri build action
       - uses: tauri-apps/tauri-action@v0.4.3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
         with:
-          tagName: app-v__VERSION__ # the action automatically replaces \_\_VERSION\_\_ with the app version
+          tagName: app-v__VERSION__
           releaseName: 'App v__VERSION__'
           releaseBody: 'See the assets to download this version and install.'
           releaseDraft: true
