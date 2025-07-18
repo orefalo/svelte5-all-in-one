@@ -1,66 +1,66 @@
 {
-  "$schema": "../node_modules/@tauri-apps/cli/schema.json",
-  "build": {
-    "beforeBuildCommand": "",
-    "beforeDevCommand": ""
-  },
-  "identifier": "com.example.sv1",
-  "productName": "sv1",
-  "version": "0.3.0",
-  "app": {
-    "security": {
-      "csp": null
-    },
-    "windows": [
-      {
-        "fullscreen": false,
-        "height": 600,
-        "resizable": true,
-        "title": "sv1",
-        "width": 800
-      }
-    ]
-  },
-  "bundle": {
-    "active": true,
-    "category": "DeveloperTool",
-    "copyright": "",
-    "externalBin": [],
-    "icon": [
-      "icons/32x32.png",
-      "icons/128x128.png",
-      "icons/128x128@2x.png",
-      "icons/icon.icns",
-      "icons/icon.ico"
-    ],
-    "longDescription": "",
-    "macOS": {
-      "entitlements": "entitlements.plist",
-      "exceptionDomain": "",
-      "frameworks": [],
-      "providerShortName": null,
-      "signingIdentity": null
-    },
-    "resources": [],
-    "shortDescription": "",
-    "targets": "all",
-    "windows": {
-      "certificateThumbprint": null,
-      "digestAlgorithm": "sha256",
-      "timestampUrl": ""
-    }
-  },
-  "tauri": {
-    "bundle": {
-      "identifier": "com.mycompany.sv1demo",
-      "macOS": {
-        "signingIdentity": "Developer ID Application: Mantis Bible Company (HEGN9W2S9J)",
-        "entitlements": null,
-        "exceptionDomain": null,
-        "frameworks": [],
-        "minimumSystemVersion": null,
-        "providerShortName": "TEAMID"
-      }
-    }
-  }
+	"$schema": "../node_modules/@tauri-apps/cli/schema.json",
+	"build": {
+		"beforeBuildCommand": "",
+		"beforeDevCommand": ""
+	},
+	"identifier": "com.example.sv1",
+	"productName": "sv1",
+	"version": "0.3.0",
+	"app": {
+		"security": {
+			"csp": null
+		},
+		"windows": [
+			{
+				"fullscreen": false,
+				"height": 600,
+				"resizable": true,
+				"title": "sv1",
+				"width": 800
+			}
+		]
+	},
+	"bundle": {
+		"active": true,
+		"category": "DeveloperTool",
+		"copyright": "",
+		"externalBin": [],
+		"icon": [
+			"icons/32x32.png",
+			"icons/128x128.png",
+			"icons/128x128@2x.png",
+			"icons/icon.icns",
+			"icons/icon.ico"
+		],
+		"longDescription": "",
+		"macOS": {
+			"entitlements": "entitlements.plist",
+			"exceptionDomain": "",
+			"frameworks": [],
+			"providerShortName": null,
+			"signingIdentity": null
+		},
+		"resources": [],
+		"shortDescription": "",
+		"targets": "all",
+		"windows": {
+			"certificateThumbprint": null,
+			"digestAlgorithm": "sha256",
+			"timestampUrl": ""
+		}
+	},
+	"tauri": {
+		"bundle": {
+			"identifier": "com.mycompany.sv1demo",
+			"macOS": {
+				"signingIdentity": "Developer ID Application: Mantis Bible Company (HEGN9W2S9J)",
+				"entitlements": null,
+				"exceptionDomain": null,
+				"frameworks": [],
+				"minimumSystemVersion": null,
+				"providerShortName": "TEAMID"
+			}
+		}
+	}
 }

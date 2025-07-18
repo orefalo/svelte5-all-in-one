@@ -1,15 +1,10 @@
 <script lang="ts">
-	import { i18n } from '$lib/i18n';
-	import * as m from '$lib/paraglide/messages.js';
-	import type { AvailableLanguageTag } from '$lib/paraglide/runtime';
-
-	function switchToLanguage(newLanguage: AvailableLanguageTag) {
-		i18n.setLanguage(newLanguage);
-	}
+	import { m } from '$lib/paraglide/messages.js';
+	import { setLocale } from '$lib/paraglide/runtime';
 </script>
 
 <h1>{m.hello_world({ name: 'SvelteKit User' })}</h1>
 <div>
-	<button onclick={() => switchToLanguage('en')}>en</button>
-	<button onclick={() => switchToLanguage('es')}>es</button>
+	<button onclick={() => setLocale('en')}>en</button>
+	<button onclick={() => setLocale('es')}>es</button>
 </div>

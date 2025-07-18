@@ -53,7 +53,6 @@ To automate the code signing and notarization of your Tauri application for macO
 2. **Copy** the contents of `certificate-base64.txt`.
 
 3. **Add the following secrets** to your GitHub repository under **Settings > Secrets and variables > Actions**:
-
    - `MACOS_CERTIFICATE_BASE64`: The base64-encoded certificate.
    - `MACOS_CERTIFICATE_PASSWORD`: The password you set during export.
    - `APPLE_ID`: Your Apple ID email.
@@ -66,19 +65,19 @@ Update your `tauri.conf.json` or `tauri.config.json` file:
 
 ```json
 {
-  "tauri": {
-    "bundle": {
-      "identifier": "com.mycompany.sv1demo",
-      "macOS": {
-        "signingIdentity": "Developer ID Application: Your Name (TEAMID)",
-        "entitlements": null,
-        "exceptionDomain": null,
-        "frameworks": [],
-        "minimumSystemVersion": null,
-        "providerShortName": "TEAMID"
-      }
-    }
-  }
+	"tauri": {
+		"bundle": {
+			"identifier": "com.mycompany.sv1demo",
+			"macOS": {
+				"signingIdentity": "Developer ID Application: Your Name (TEAMID)",
+				"entitlements": null,
+				"exceptionDomain": null,
+				"frameworks": [],
+				"minimumSystemVersion": null,
+				"providerShortName": "TEAMID"
+			}
+		}
+	}
 }
 ```
 
@@ -177,7 +176,6 @@ jobs:
 2. **Copy** the contents of `certificate-base64.txt`.
 
 3. **Add the following secrets** to your GitHub repository:
-
    - `WINDOWS_CERTIFICATE_BASE64`: The base64-encoded certificate.
    - `WINDOWS_CERTIFICATE_PASSWORD`: The password set during export.
 
@@ -187,15 +185,15 @@ Update your `tauri.conf.json` or `tauri.config.json` file:
 
 ```json
 {
-  "tauri": {
-    "bundle": {
-      "windows": {
-        "certificateThumbprint": "YOUR_CERTIFICATE_THUMBPRINT",
-        "digestAlgorithm": "sha256",
-        "timestampUrl": "http://timestamp.digicert.com"
-      }
-    }
-  }
+	"tauri": {
+		"bundle": {
+			"windows": {
+				"certificateThumbprint": "YOUR_CERTIFICATE_THUMBPRINT",
+				"digestAlgorithm": "sha256",
+				"timestampUrl": "http://timestamp.digicert.com"
+			}
+		}
+	}
 }
 ```
 
@@ -233,7 +231,7 @@ build-windows:
 
     - name: Build and Sign the App
       env:
-        CSC_LINK: "certificate.pfx"
+        CSC_LINK: 'certificate.pfx'
         CSC_KEY_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
       run: |
         npm run tauri:build

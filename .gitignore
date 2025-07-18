@@ -4,6 +4,8 @@ node_modules
 # Output
 .output
 .vercel
+.netlify
+.wrangler
 /.svelte-kit
 /build
 
@@ -29,3 +31,5 @@ static/icon-*.png
 static/apple-touch-icon.png
 static/favicon*
 
+# Paraglide
+src/lib/paraglide

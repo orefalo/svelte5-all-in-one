@@ -1,76 +1,91 @@
 {
-  "name": "sv1-demo",
-  "title": "app title here",
-  "homepage": "https://example.com",
-  "description": "app description here",
-  "version": "0.5.1",
-  "identifier": "com.mycompany.sv1demo",
-  "type": "module",
-  "scripts": {
-    "dev": "vite dev --host 0.0.0.0",
-    "build": "vite build",
-    "build-old": "vite build && npm run postbuild",
-    "preview": "vite preview",
-    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-    "format": "prettier --write .",
-    "lint": "prettier --check . && eslint .",
-    "test:unit": "vitest",
-    "test": "npm run test:unit -- --run && npm run test:e2e",
-    "test:e2e": "playwright test",
-    "postbuild": "npx svelte-kit sync",
-    "postbuild-old": "npx svelte-kit sync && svelte-kit build",
-    "ios": "npm run build && npx cap sync && npx cap update ios && npx cap copy ios && npx cap run ios",
-    "ios-reload": "cap run ios -l --external --port=5173",
-    "android": "npm run build && npx cap sync && npx cap update android && npx cap copy android && npx cap run android",
-    "android-reload": "cap run android -l --external --port=5173",
-    "tauri": "npx tauri",
-    "tauri:dev": "npx tauri dev",
-    "tauri:build": "npx tauri build",
-    "build-tauri": "npx run build && tauri build"
-  },
-  "devDependencies": {
-    "@capacitor/cli": "^6.1.2",
-    "@playwright/test": "^1.45.3",
-    "@sveltejs/adapter-static": "^3.0.6",
-    "@sveltejs/kit": "^2.5.27",
-    "@sveltejs/vite-plugin-svelte": "^4.0.0",
-    "@tauri-apps/cli": "^2.0.4",
-    "@types/eslint": "^9.6.0",
-    "autoprefixer": "^10.4.20",
-    "bits-ui": "^0.21.16",
-    "clsx": "^2.1.1",
-    "eslint": "^9.7.0",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-svelte": "^2.45.1",
-    "globals": "^15.0.0",
-    "prettier": "^3.3.2",
-    "prettier-plugin-svelte": "^3.2.6",
-    "prettier-plugin-tailwindcss": "^0.6.5",
-    "svelte": "^5.0.0",
-    "svelte-check": "^4.0.0",
-    "svelte-kit": "^1.2.0",
-    "tailwind-merge": "^2.5.4",
-    "tailwind-variants": "^0.2.1",
-    "tailwindcss": "^3.4.9",
-    "typescript": "^5.5.0",
-    "typescript-eslint": "^8.0.0",
-    "vite": "^5.4.4",
-    "vitest": "^2.0.4"
-  },
-  "dependencies": {
-    "@capacitor/android": "^6.1.2",
-    "@capacitor/core": "^6.1.2",
-    "@capacitor/ios": "^6.1.2",
-    "@inlang/paraglide-sveltekit": "^0.11.1",
-    "rollup": "^4.x.x"
-  },
-  "optionalDependencies": {
-    "@rollup/rollup-win32-x64-msvc": "^4.x.x"
-  },
-  "overrides": {
-    "vite": {
-      "rollup": "npm:@rollup/wasm-node"
-    }
-  }
+	"name": "sv1-demo",
+	"title": "app title here",
+	"homepage": "https://example.com",
+	"description": "app description here",
+	"version": "0.6.0",
+	"identifier": "com.mycompany.sv1demo",
+	"type": "module",
+	"scripts": {
+		"dev": "vite dev --host 0.0.0.0",
+		"build": "vite build",
+		"build-old": "vite build && pnpm run postbuild",
+		"preview": "vite preview",
+		"prepare": "svelte-kit sync || echo ''",
+		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+		"format": "prettier --write .",
+		"lint": "prettier --check . && eslint .",
+		"test:unit": "vitest",
+		"test": "pnpm run test:unit -- --run && pnpm run test:e2e",
+		"test:e2e": "playwright test",
+		"postbuild": "npx svelte-kit sync",
+		"postbuild-old": "npx svelte-kit sync && svelte-kit build",
+		"ios": "pnpm run build && npx cap sync && npx cap update ios && npx cap copy ios && npx cap run ios",
+		"ios-reload": "cap run ios -l --external --port=5173",
+		"android": "pnpm run build && npx cap sync && npx cap update android && npx cap copy android && npx cap run android",
+		"android-reload": "cap run android -l --external --port=5173",
+		"tauri": "npx tauri",
+		"tauri:dev": "npx tauri dev",
+		"tauri:build": "npx tauri build",
+		"build-tauri": "npx run build && tauri build"
+	},
+	"devDependencies": {
+		"@capacitor/cli": "^7.4.2",
+		"@eslint/compat": "^1.2.5",
+		"@eslint/js": "^9.18.0",
+		"@lucide/svelte": "^0.525.0",
+		"@playwright/test": "^1.54.1",
+		"@sveltejs/adapter-static": "^3.0.8",
+		"@sveltejs/kit": "^2.25.0",
+		"@sveltejs/vite-plugin-svelte": "^6.1.0",
+		"@tailwindcss/postcss": "^4.1.11",
+		"@tailwindcss/vite": "^4.0.0",
+		"@tauri-apps/cli": "^2.6.2",
+		"@types/eslint": "^9.6.1",
+		"@vitest/browser": "^3.2.4",
+		"autoprefixer": "^10.4.21",
+		"playwright": "^1.53.0",
+		"clsx": "^2.1.1",
+		"eslint": "^9.31.0",
+		"eslint-config-prettier": "^10.1.5",
+		"eslint-plugin-svelte": "^3.11.0",
+		"globals": "^16.3.0",
+		"prettier": "^3.6.2",
+		"prettier-plugin-svelte": "^3.4.0",
+		"prettier-plugin-tailwindcss": "^0.6.14",
+		"svelte": "^5.36.5",
+		"svelte-check": "^4.3.0",
+		"tailwind-merge": "^3.3.1",
+		"tailwind-variants": "^1.0.0",
+		"tailwindcss": "^4.1.11",
+		"tw-animate-css": "^1.3.5",
+		"typescript": "^5.8.3",
+		"typescript-eslint": "^8.37.0",
+		"vite": "^7.0.5",
+		"vitest": "^3.2.4",
+		"vitest-browser-svelte": "^1.0.0"
+	},
+	"dependencies": {
+		"@capacitor/android": "^7.4.2",
+		"@capacitor/core": "^7.4.2",
+		"@capacitor/ios": "^7.4.2",
+		"@inlang/paraglide-js": "^2.0.0",
+		"rollup": "^4.45.1"
+	},
+	"optionalDependencies": {
+		"@rollup/rollup-win32-x64-msvc": "^4.45.1"
+	},
+	"overrides": {
+		"vite": {
+			"rollup": "npm:@rollup/wasm-node"
+		}
+	},
+	"packageManager": "pnpm@10.13.1+sha512.37ebf1a5c7a30d5fabe0c5df44ee8da4c965ca0c5af3dbab28c3a1681b70a256218d05c81c9c0dcf767ef6b8551eb5b960042b9ed4300c59242336377e01cfad",
+	"pnpm": {
+		"onlyBuiltDependencies": [
+			"esbuild",
+			"svelte-kit"
+		]
+	}
 }
