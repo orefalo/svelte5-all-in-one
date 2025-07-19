@@ -1,0 +1,10 @@
+frontend:
+  limits:
+    cpu: 50m
+    memory: 48Mi
+
+mysql:
+  imageTag: "9.1"
+  fullnameOverride: mysql
+  persistence:
+    enabled: false
