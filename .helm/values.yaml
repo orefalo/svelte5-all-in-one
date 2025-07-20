@@ -8,3 +8,7 @@ mysql:
   fullnameOverride: mysql
   persistence:
     enabled: false
+
+memory:
+  staging: 1G
+  production: 2G
